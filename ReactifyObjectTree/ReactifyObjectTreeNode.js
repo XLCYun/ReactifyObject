@@ -143,11 +143,12 @@ class ReactifyObjectTreeNode extends TreeNode {
     if (treeNode instanceof ReactifyObjectTreeNode === false)
       throw TypeError("Set new value failed, target's $roTree should be an instanceof ReactifyObjectTreeNode")
 
+    if (treeNode.validator(newValue) === false) throw TypeError("Cannot set new value: Validation failed")
+    if (treeNode.compare(oldValue, newValue)) return
+
     try {
       let oldValue = treeNode.value
-      // TODO compare value
-      // TODO validate new value
-      let result = await treeNode.beforeSet.call(treeNode.root.value)
+      let result = await treeNode.beforeSet.call(treeNode.root.value, newValue)
       if (result === false) return
       treeNode.value = newValue
       await treeNode.afterSet.call(this.root.value)
