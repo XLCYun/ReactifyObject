@@ -2,7 +2,7 @@
   "name": "reactify-object",
   "version": "0.1.0",
   "description": "A useful tool use to reactify object by injecting functions and properties into object according the given configuration. ",
-  "main": "ReactifyObject.js",
+  "main": "index.js",
   "scripts": {
     "test": "npm run test"
   },
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/XLCYun/ReactifyObject#readme",
   "dependencies": {
-    "@xlcyun/event-man": "^0.2.3"
+    "@xlcyun/event-man": "^0.2.3",
+    "lodash": "^4.17.15"
   }
 }
