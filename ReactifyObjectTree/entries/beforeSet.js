@@ -1,6 +1,6 @@
 const functionEntryWrapper = require("./functionEntryWrapper")
 
 module.exports = {
-  preprocess: functionEntryWrapper.preprocess("afterSet"),
-  process: functionEntryWrapper.process("afterSet")
+  preprocess: functionEntryWrapper.preprocess("beforeSet"),
+  process: functionEntryWrapper.process("beforeSet")
 }

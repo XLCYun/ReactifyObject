@@ -123,7 +123,7 @@ class ReactifyObjectTreeNode extends TreeNode {
     }
   }
 
-  get get(this) {
+  get get() {
     let value = this.value
     let result = this.beforeSet.call(this.root.value)
 

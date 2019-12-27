@@ -1,5 +1,8 @@
+const defer_require = require("defer-require")
+const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode")
+
 function preprocess(treeNode) {
-  if (treeNode instanceof ReactifyObjectTreeNode === false)
+  if (treeNode instanceof ReactifyObjectTreeNode.module === false)
     throw TypeError('Process "type" failed: should be ReactifyObjectTreeNode')
 
   let mode = treeNode.config.mode
@@ -11,12 +14,10 @@ function preprocess(treeNode) {
 }
 
 function process(treeNode) {
-  if (treeNode instanceof ReactifyObjectTreeNode === false)
+  if (treeNode instanceof ReactifyObjectTreeNode.module === false)
     throw TypeError('Process "type" failed: should be ReactifyObjectTreeNode')
   treeNode.mode = treeNode.config.mode || "sync"
 }
-
-const ReactifyObjectTreeNode = require("../ReactifyObjectTreeNode")
 
 module.exports = {
   preprocess: preprocess,

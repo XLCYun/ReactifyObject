@@ -1,6 +1,7 @@
 const ReactifyObjectTreeNode = require("./ReactifyObjectTree/ReactifyObjectTreeNode")
 const validtor = require("./validator/validator")
 const compare = require("./compare/compare")
+const entry = require("./ReactifyObjectTree/entry")
 
 class ReactifyObject {}
 
@@ -10,6 +11,6 @@ ReactifyObject.inject = function(object, config, name = "", parent = null) {
 
 ReactifyObject.entry = entry
 ReactifyObject.validtor = validtor
-ReactifyObject.validtor = validtor.compare
+ReactifyObject.validtor = compare
 
 module.exports = ReactifyObject

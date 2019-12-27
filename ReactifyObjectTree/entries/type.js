@@ -1,4 +1,6 @@
 const validator = require("../../validator/validator")
+const defer_require = require("defer-require")
+const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode")
 
 const equalType = {
   object: "object",
@@ -10,28 +12,28 @@ const equalType = {
 }
 
 function preprocess(treeNode) {
-  if (treeNode instanceof ReactifyObjectTreeNode === false)
+  if (treeNode instanceof ReactifyObjectTreeNode.module === false)
     throw TypeError('Process "type" failed: should be ReactifyObjectTreeNode')
 
   let types = []
-  if (Array.isArray(config.type)) types = treeNode.config.type
-  else types = [treeNode.config.type]
+  if (treeNode.config.type !== undefined) {
+    if (Array.isArray(treeNode.config.type)) types = treeNode.config.type
+    else types = [treeNode.config.type]
+  }
 
   if (!treeNode.type) treeNode.type = []
   if (!treeNode.bsonType) treeNode.bsonType = []
 
-  treeNode.type = validator.typeFilter(
-    types.map(e => equalType[e]),
-    true
-  )
-  treeNode.bsonType = treeNode.bsonType.concat(treeNode.type)
+  treeNode.type = validator
+    .typeFilter(types.map(e => equalType[e]))
+    .filter(e => treeNode.type.includes(e) === false)
+    .concat(treeNode.type)
+  treeNode.bsonType = treeNode.bsonType.concat(treeNode.type.filter(e => treeNode.bsonType.includes(e) === false))
 }
 
-function process(treeNode) {}
+function process() {}
 
 module.exports = {
   preprocess,
   process
 }
-
-const ReactifyObjectTreeNode = require("../ReactifyObjectTreeNode")

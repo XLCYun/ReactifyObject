@@ -7,6 +7,7 @@ const functions = {
   string: tripleEqual,
   object: _.isEqual,
   array: _.isEqual,
+  bool: _.isEqual,
   date: _.isEqual,
   null: tripleEqual,
   regex: _.isEqual,
@@ -31,12 +32,13 @@ function compare(value1, value2, passibleType) {
 
 function typeFilter(typeArray, throwError = true) {
   if (_.isArray(typeArray) === false) throw TypeError("typeError should be an array")
+  if (_.isBoolean(throwError) === false) throw TypeError("throwError should be a specific boolean")
 
   let validType = getTypes()
   let res = []
   for (let type of typeArray) {
-    if (validType.includes(config.type) === false) {
-      if (throwError === true) throw new Error(`Not supported type: ${config.type}`)
+    if (validType.includes(type) === false) {
+      if (throwError === true) throw new Error(`Not supported type: ${type}`)
       continue
     }
     if (res.includes(type) === false) res.push(type)
@@ -49,6 +51,7 @@ function defineCompare(type, func) {
   if (typeof func !== "function") throw TypeError("validator should be a function")
   functions[type] = func
 }
+
 module.exports = {
   functions: functions,
   compare: compare,

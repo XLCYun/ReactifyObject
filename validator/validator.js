@@ -2,7 +2,7 @@ const _ = require("lodash")
 
 const functions = {
   double: _.isNumber,
-  string: _.isString,
+  string: e => e instanceof String === false && _.isString(e) === true,
   object: _.isObject,
   array: _.isArray,
   bool: _.isBoolean,
@@ -10,8 +10,8 @@ const functions = {
   null: _.isNull,
   regex: _.isRegExp,
   int: _.isInteger,
-  timestamp: a => _.isNumber(a) && a > 0,
-  long: _.isNumber
+  timestamp: a => _.isSafeInteger(a) && a > 0,
+  long: _.isInteger
 }
 
 const deprecated = ["undefined", "dbPointer", "symbol"]
@@ -34,6 +34,7 @@ function validate(value, passibleType) {
 
 function typeFilter(typeArray, throwError = true) {
   if (_.isArray(typeArray) === false) throw TypeError("typeError should be an array")
+  if (_.isBoolean(throwError) === false) throw TypeError("throwError should be a specific boolean")
   let validType = getTypes()
   let res = []
   for (let type of typeArray) {
@@ -49,8 +50,8 @@ function typeFilter(typeArray, throwError = true) {
       if (throwError === true) throw new Error(`${type} is not yet supported`)
       continue
     }
-    if (validType.includes(config.type) === false) {
-      if (throwError === true) throw new Error(`Not supported type: ${config.type}`)
+    if (validType.includes(type) === false) {
+      if (throwError === true) throw new Error(`Not supported type: ${type}`)
       continue
     }
     if (res.includes(type) === false) res.push(type)

@@ -5,13 +5,14 @@ class TreeNode {
     if (parent && parent instanceof TreeNode === false) throw new TypeError(`Parent should be a TreeNode`)
     if (!config) throw new ReferenceError("Config inaccessable")
     if (_.isPlainObject(config) === false) throw new TypeError("Config should be an plained object")
-    if (_.isPlainObject(config.properties) === false) throw new TypeError('"properties" should be an object')
+    if (config.properties && _.isPlainObject(config.properties) === false)
+      throw new TypeError('"properties" should be an object')
     if (typeof name !== "string") throw new TypeError("name of a property should be string")
 
-    // set type
-    if (!parent) this.type = "root"
-    else if (config.properties) this.type = "node"
-    else this.type = "leaf"
+    // set nodeType
+    if (!parent) this.nodeType = "root"
+    else if (config.properties) this.nodeType = "node"
+    else this.nodeType = "leaf"
 
     // set name
     this.name = name
@@ -26,13 +27,13 @@ class TreeNode {
   }
 
   get isRoot() {
-    return this.type === "root"
+    return this.nodeType === "root"
   }
   get isNode() {
-    return this.type === "node"
+    return this.nodeType === "node"
   }
   get isLeaf() {
-    return this.type === "leaf"
+    return this.nodeType === "leaf"
   }
   get root() {
     return this.isRoot ? this : this.parent.root
