@@ -1,5 +1,5 @@
 const defer_require = require("defer-require")
-const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 
 function preprocess(name) {
   if (typeof name !== "string") throw new TypeError("name for the preprocess wrapper should be a string")

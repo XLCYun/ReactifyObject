@@ -1,7 +1,7 @@
 require("mocha")
 const assert = require("assert")
 const defer_require = require("defer-require")
-const ReactifyObjectTreeNode = defer_require("../../../ReactifyObjectTree/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = defer_require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 const mixType = require("../../helper/mixType")
 
 const update = require("../../../ReactifyObjectTree/entries/update")

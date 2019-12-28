@@ -1,75 +1,47 @@
 const _ = require("lodash")
-const entry = require("./entry")
 const EventMan = require("@xlcyun/event-man")
-const TreeNode = require("./TreeNode")
+const TreeNode = require("../TreeNode/TreeNode")
+const processConfig = require("./processConfig")
+const setupValue = require("./setupValue")
+const injectToObject = require("./injectToObject")
 
 class ReactifyObjectTreeNode extends TreeNode {
   constructor(object, config, name, parent) {
     super(config, name, parent)
-
     this.object = object
 
     // set event
     if (this.isRoot) this.eventMan = new EventMan()
-
-    // set children, value
-    this.children = {}
-    if (this.isLeaf === false) {
-      this.value = {
-        $roTree: this,
-        $set: ReactifyObjectTreeNode.set,
-        $register: ReactifyObjectTreeNode.register
-      }
-      this.value.$set = ReactifyObjectTreeNode.set
-      this.value
-
-      Object.defineProperty(this.value, "$register", {
-        get: function() {
-          return this.$roTree.register
-        }
-      })
-
-      let keys = Object.keys(this.config.properties)
-      for (let key of keys) {
-        this.children[key] = new ReactifyObjectTreeNode(
-          object && object[key] !== undefined ? object[key] : undefined,
-          this.config.properties[key],
-          key,
-          this
-        )
-        // 构造 getter/setter
-        Object.defineProperty(this.value, key, {
-          get: () => this.get,
-          set: value => {
-            if (this.mode === "async")
-              throw new Error("Async mode property, should not use setter, use $set function to change its value.")
-            this.set(value)
-          }
-        })
-      }
-    } else this.value = object // validate ?
-
-    // prepocess/process
-    let entryKeys = Object.keys(entry)
-    for (let key of entryKeys) entry[key].preprocess(this)
-    for (let key of entryKeys) entry[key].process(this)
-
+    // prepocess/process config
+    processConfig.call(this)
+    // set value
+    setupValue.call(this)
     // call init
     this.init.call(this.value)
-
     // inject to object
-    if (this.isRoot) {
-      if (!object || typeof object !== "object") throw TypeError("Invalid object to inject.")
-      this.object.$roTree = this
-      this.object.$set = ReactifyObjectTreeNode.set
-      this.object.register = ReactifyObjectTreeNode.register
-      let keys = Object.keys(this.config.properties)
-      for (let key of keys)
-        Object.defineProperty(this.object, key, {
-          get: Object.getOwnPropertyDescriptor(this.value, key).get,
-          set: Object.getOwnPropertyDescriptor(this.value, key).set
-        })
-    }
+    injectToObject.call(this)
+  }
+
+  /**
+   * set the parent of this TreeNode
+   * @param {ReactifyObjectTreeNode} parent parent
+   */
+  setParent(parent) {
+    if (parent instanceof ReactifyObjectTreeNode === false)
+      throw new TypeError("parent should be an instance of ReactifyObjectTreeNode")
+    super.setParent(parent)
+  }
+
+  /**
+   * append a child to this TreeNode
+   * @param {ReactifyObjectTreeNode} child child
+   */
+  appendChild(child) {
+    if (child instanceof ReactifyObjectTreeNode === false)
+      throw new TypeError("child should be an instance of ReactifyObjectTreeNode")
+    if (this.isLeaf && _.isObject(this.value) === false)
+      throw new TypeError("leaf(property) with non-object value cannot append a child")
+    super.appendChild(child)
   }
 
   get event() {

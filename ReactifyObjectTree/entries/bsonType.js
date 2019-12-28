@@ -1,7 +1,7 @@
 const validator = require("../../validator/validator")
 const compare = require("../../compare/compare")
 const defer_require = require("defer-require")
-const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 
 function preprocess(treeNode) {
   if (treeNode instanceof ReactifyObjectTreeNode.module === false)
