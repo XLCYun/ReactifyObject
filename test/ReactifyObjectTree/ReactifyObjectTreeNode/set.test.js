@@ -87,10 +87,32 @@ describe("set.js", function() {
         assert.ok(test)
       })
 
-      it("beforeSet is called and its `this` bind to the target object", function() {
+      it("afterSet is called and its `this` bind to the target object", function() {
         let test = false
         treeNode.children.a2.afterSet = function() {
           assert.equal(this, treeNode.value)
+          test = true
+        }
+        set(treeNode.value, "a2", "new value", "sync")
+        assert.ok(test)
+      })
+
+      it("beforeSet is called, first argument is new value, second argument is current value", function() {
+        let test = false
+        treeNode.children.a2.beforeSet = function(newValue, oldValue) {
+          assert.equal(newValue, "new value")
+          assert.equal(oldValue, "I am a2")
+          test = true
+        }
+        set(treeNode.value, "a2", "new value", "sync")
+        assert.ok(test)
+      })
+
+      it("afterSet is called, first argument is new value, second argument is old value", function() {
+        let test = false
+        treeNode.children.a2.afterSet = function(newValue, oldValue) {
+          assert.equal(newValue, "new value")
+          assert.equal(oldValue, "I am a2")
           test = true
         }
         set(treeNode.value, "a2", "new value", "sync")
@@ -188,6 +210,29 @@ describe("set.js", function() {
         await set(treeNode.value, "a2", "new value", "async")
         assert.ok(test)
       })
+
+      it("beforeSet is called, first argument is new value, second argument is current value",async function() {
+        let test = false
+        treeNode.children.a2.beforeSet = async function(newValue, oldValue) {
+          assert.equal(newValue, "new value")
+          assert.equal(oldValue, "I am a2")
+          test = true
+        }
+        await set(treeNode.value, "a2", "new value", "async")
+        assert.ok(test)
+      })
+
+      it("afterSet is called, first argument is new value, second argument is old value",async function() {
+        let test = false
+        treeNode.children.a2.afterSet = async function(newValue, oldValue) {
+          assert.equal(newValue, "new value")
+          assert.equal(oldValue, "I am a2")
+          test = true
+        }
+        await set(treeNode.value, "a2", "new value", "async")
+        assert.ok(test)
+      })
+
 
       it("beforeSet return false, will abort the set function", async function() {
         treeNode.children.a2.value = "a2 value"

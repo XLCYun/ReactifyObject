@@ -10,12 +10,12 @@ const ReactifyObjectTreeNode = deferRequire("../../ReactifyObjectTree/ReactifyOb
 function setSync(treeNode, newValue) {
   let oldValue = treeNode.value
   // The function `set` already make sure it has parent
-  let result = treeNode.beforeSet.call(treeNode.parent.value, newValue)
+  let result = treeNode.beforeSet.call(treeNode.parent.value, newValue, oldValue) 
   if (result === false) return
-  treeNode.event.emit("beforeSet", treeNode.parent.value, newValue, oldValue).once 
+  treeNode.event.emit("beforeSet", treeNode.parent.value, newValue, oldValue).once
   treeNode.value = newValue
-  treeNode.afterSet.call(treeNode.parent.value)
-  treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once 
+  treeNode.afterSet.call(treeNode.parent.value, newValue, oldValue) 
+  treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once
 }
 
 /**
@@ -28,12 +28,12 @@ async function setAsync(treeNode, newValue) {
   try {
     let oldValue = treeNode.value
     // The function `set` already make sure it has parent
-    let result = await treeNode.beforeSet.call(treeNode.parent.value)
+    let result = await treeNode.beforeSet.call(treeNode.parent.value, newValue, oldValue) 
     if (result === false) return
     await treeNode.event.emit("beforeSet", treeNode.parent.value, newValue, oldValue).once
     treeNode.value = newValue
-    await treeNode.afterSet.call(treeNode.parent.value)
-    await treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once 
+    await treeNode.afterSet.call(treeNode.parent.value, newValue, oldValue) 
+    await treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once
   } catch (e) {
     throw e
   }

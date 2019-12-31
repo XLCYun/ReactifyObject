@@ -51,6 +51,25 @@ describe("get.js", function() {
       assert.ok(afterGetFlag)
     })
 
+    it("beforeGet and afterGet's first argument is the value that will be returned as the value", function() {
+      let beforeGet = false
+      let afterGet = false
+      treeNode.beforeGet = function(value) {
+        beforeGet = true
+        assert.equal(value, treeNode.value)
+        return "replace value"
+      }
+      treeNode.afterGet = function(value) {
+        afterGet = true
+        assert.equal(value, "replace value")
+        return "replace replace value"
+      }
+      let res = get.call(treeNode)
+      assert.equal(res, "replace replace value")
+      assert.ok(beforeGet)
+      assert.ok(afterGet)
+    })
+
     it("beforeGet return undefined, will get property's value, and emit 'beforeGet' event", function() {
       let test = false
       treeNode.children.a2.beforeGet = function() {
@@ -179,6 +198,25 @@ describe("get.js", function() {
       }
       treeNode.mode = "async"
       await get.call(treeNode)
+      assert.ok(beforeGet)
+      assert.ok(afterGet)
+    })
+
+    it("beforeGet and afterGet's first argument is the value that will be returned as the value", async function() {
+      let beforeGet = false
+      let afterGet = false
+      treeNode.children.a2.beforeGet = async function(value) {
+        beforeGet = true
+        assert.equal(value, "I am a2")
+        return "replace value"
+      }
+      treeNode.children.a2.afterGet = async function(value) {
+        afterGet = true
+        assert.equal(value, "replace value")
+        return "replace replace value"
+      }
+      let res = await get.call(treeNode.children.a2)
+      assert.equal(res, "replace replace value")
       assert.ok(beforeGet)
       assert.ok(afterGet)
     })

@@ -4,7 +4,7 @@
   "description": "A useful tool use to reactify object by injecting functions and properties into object according the given configuration. ",
   "main": "ReactifyObject.js",
   "scripts": {
-    "test": "mocha ./test"
+    "test": "node ./node_modules/mocha/bin/mocha './test/**/*.test.js'"
   },
   "repository": {
     "type": "git",
