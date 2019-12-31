@@ -1,6 +1,8 @@
 # reactify-object
 
-`reactify-object` is a event-driven tool use to reactify object by injecting accessors(getter/setter) into object according the given configuration.
+`reactify-object` is a event-driven, lazy-update and flexible tool use to reactify object by injecting accessors(getter/setter) into object according the given configuration.
+
+`This README.md is not finished. More features have not revealed in here.`
 
 ## Installation
 
@@ -61,6 +63,3 @@ Output:
 ```
 Origin
 ```
-
-
-
