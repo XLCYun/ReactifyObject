@@ -2,7 +2,10 @@ require("mocha")
 const assert = require("assert")
 const functionEntryWrapper = require("../../../ReactifyObjectTree/entries/functionEntryWrapper")
 const defer_require = require("defer-require")
-const ReactifyObjectTreeNode = defer_require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = defer_require(
+  "../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
+)
+const entry = require("../../../ReactifyObjectTree/entries/entry")
 const mixType = require("../../helper/mixType")
 
 describe("functionEntryWrapper", function() {
@@ -17,7 +20,7 @@ describe("functionEntryWrapper", function() {
         }
       })
 
-      it("invalid argument", function() {
+      it("invalid argument: name", function() {
         for (let i of mixType.getAll().filter(e => typeof e !== "string"))
           try {
             functionEntryWrapper.preprocess(i)
@@ -31,6 +34,8 @@ describe("functionEntryWrapper", function() {
     describe("functionality", function() {
       let treeNode = undefined
       this.beforeEach(() => {
+        entry.testFunction = { preprocess: () => {}, process: () => {} }
+        entry.testVariable = { preprocess: () => {}, process: () => {} }
         treeNode = new ReactifyObjectTreeNode.module(
           {},
           {
@@ -44,6 +49,10 @@ describe("functionEntryWrapper", function() {
           "",
           null
         )
+      })
+      afterEach(() => {
+        delete entry.testFunction
+        delete entry.testVariable
       })
 
       it("test returned function's arguement", function() {
@@ -89,7 +98,7 @@ describe("functionEntryWrapper", function() {
         }
       })
 
-      it("invalid argument", function() {
+      it("invalid argument: name", function() {
         for (let i of mixType.getAll().filter(e => typeof e !== "string"))
           try {
             functionEntryWrapper.process(i)
@@ -98,11 +107,18 @@ describe("functionEntryWrapper", function() {
             assert.ok(e instanceof TypeError)
           }
       })
+
+      it("invalid argument: defaultFunction", function() {
+        for (let i of mixType.getAll().filter(e => typeof e !== "function"))
+          assert.throws(() => functionEntryWrapper.process("name", i))
+      })
     })
 
     describe("functionality", function() {
       let treeNode = undefined
-      this.beforeEach(() => {
+      beforeEach(() => {
+        entry.testFunction = { preprocess: () => {}, process: () => {} }
+        entry.testVariable = { preprocess: () => {}, process: () => {} }
         treeNode = new ReactifyObjectTreeNode.module(
           {},
           {
@@ -117,25 +133,29 @@ describe("functionEntryWrapper", function() {
           null
         )
       })
+      afterEach(() => {
+        delete entry.testFunction
+        delete entry.testVariable
+      })
 
       it("test returned function's arguement", function() {
-        let func = functionEntryWrapper.process("testFunction")
+        let func = functionEntryWrapper.process("testFunction", () => {})
         for (let i of mixType.getAll().concat([undefined]))
           assert.throws(() => func(i), TypeError, "should throw TypeError with not treeNode argument")
         assert.doesNotThrow(() => func(treeNode), TypeError, "pass treeNode, should not throw TypeError")
       })
 
       it("testFunction will be inject to treeNode", function() {
-        let func = functionEntryWrapper.process("testFunction")
+        let func = functionEntryWrapper.process("testFunction", () => {})
         func(treeNode.children.prop)
         assert.equal(treeNode.children.prop.testFunction(), "test")
       })
 
       it("entry is not existed in config, a default function will be injected, which return undefined", function() {
-        let func = functionEntryWrapper.process("notExistedConfigEntryName")
+        let func = functionEntryWrapper.process("notExistedConfigEntryName", () => "default function")
         func(treeNode.children.prop)
         assert.ok(typeof treeNode.children.prop.notExistedConfigEntryName === "function")
-        assert.equal(treeNode.children.prop.notExistedConfigEntryName(), undefined)
+        assert.equal(treeNode.children.prop.notExistedConfigEntryName(), "default function")
       })
     })
   })

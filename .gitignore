@@ -47,6 +47,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# VSCode extension VSCodeCounter
+.VSCodeCounter/
+
 # Optional npm cache directory
 .npm
 

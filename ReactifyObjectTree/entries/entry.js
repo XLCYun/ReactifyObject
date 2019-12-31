@@ -9,6 +9,7 @@ const beforeUpdate = require("./beforeUpdate")
 const afterUpdate = require("./afterUpdate")
 const mode = require("./mode")
 const init = require("./init")
+const properties = require("./properties")
 
 module.exports = {
   type,
@@ -21,5 +22,6 @@ module.exports = {
   beforeUpdate,
   afterUpdate,
   mode,
-  init
+  init,
+  properties
 }

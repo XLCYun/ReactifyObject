@@ -1,25 +1,37 @@
 const _ = require("lodash")
-const EventMan = require("@xlcyun/event-man")
 const TreeNode = require("../TreeNode/TreeNode")
 const processConfig = require("./processConfig")
 const setupValue = require("./setupValue")
 const injectToObject = require("./injectToObject")
+const setFunction = require("./set")
+const getFunction = require("./get")
+const EventMan = require("@xlcyun/event-man")
 
 class ReactifyObjectTreeNode extends TreeNode {
   constructor(object, config, name, parent) {
     super(config, name, parent)
     this.object = object
 
-    // set event
-    if (this.isRoot) this.eventMan = new EventMan()
+    this.event = new EventMan()
     // prepocess/process config
     processConfig.call(this)
-    // set value
+    // setup value
     setupValue.call(this)
-    // call init
-    this.init.call(this.value)
-    // inject to object
+    // inject to object if it's root
     injectToObject.call(this)
+    delete this.event.thisArg
+    Object.defineProperty(this.event, "thisArg", {
+      get: () => (this.isRoot ? this.object : this.parent.value)
+    })
+
+    // register 'init' event
+    this.event.on("init", function(self) {
+      self.init.call(this, self)
+      // emit 'init' for children
+      for (let key of Object.keys(self.children)) self.children[key].event.emit("init", self.children[key]).once
+    })
+    // Root node triggers 'init' event
+    if (this.isRoot) this.event.emit("init", this).once
   }
 
   /**
@@ -29,7 +41,7 @@ class ReactifyObjectTreeNode extends TreeNode {
   setParent(parent) {
     if (parent instanceof ReactifyObjectTreeNode === false)
       throw new TypeError("parent should be an instance of ReactifyObjectTreeNode")
-    super.setParent(parent)
+    parent.appendChild(this)
   }
 
   /**
@@ -41,101 +53,81 @@ class ReactifyObjectTreeNode extends TreeNode {
       throw new TypeError("child should be an instance of ReactifyObjectTreeNode")
     if (this.isLeaf && _.isObject(this.value) === false)
       throw new TypeError("leaf(property) with non-object value cannot append a child")
-    super.appendChild(child)
+    let e = super.appendChild(child)
+    if (e instanceof Error) throw e
   }
 
-  get event() {
-    return treeNode.isRoot ? treeNode.eventMan : treeNode.parent.event
+  /**
+   * get root's value
+   */
+  get $root() {
+    return this.root.value
   }
 
-  collectChildrenPath() {
-    let keys = Object.keys(treeNode.children)
-    let res = [treeNode.path]
+  /**
+   * register the property's dependence on object[name]
+   * @param {Object} object targent's parent object
+   * @param {String} name targent's name in its parent
+   * @param {Boolean} deep if true, register the dependences to its children as well
+   */
+  register(object, name, deep = false) {
+    if (_.isObject(object) === false) throw TypeError(`Register failed: Invalid object, received ${object}`)
+    if (_.isString(name) === false) throw TypeError("Register failed: name should be a string")
+    if (_.isBoolean(deep) === false) throw TypeError("Register failed: deep should be a boolean")
 
-    if (treeNode.isLeaf) return res
-    for (let key of keys) res = res.concat(treeNode.children[key].collectChildrenPath())
-    return res
-  }
-
-  static register(object, name, deep = false) {
-    let targetTreeNode = object.$roTree.children[name]
-    if (!object) throw ReferenceError("Register failed, target object is not accessible")
     if (object.$roTree instanceof ReactifyObjectTreeNode === false)
-      throw TypeError("Register failed, target object is not a valid $roTree")
+      throw TypeError("Cannot find $roTree in target object, are you sure it's reactified in config object?")
+
+    let targetTreeNode = object.$roTree.children[name]
     if (targetTreeNode instanceof ReactifyObjectTreeNode === false)
-      throw TypeError("Register failed, cannot find the corresponding $roTree of the target")
+      throw TypeError(
+        `Register failed: canot find ${name} in ${object.$roTree.path}, are you sure it's reactified in config object?`
+      )
 
-    let eventName = deep === true ? targetTreeNode.collectChildrenPath() : [targetTreeNode.path]
-    this.event.on(eventName, targetTreeNode.update)
+    targetTreeNode.event.on("afterSet", this.update.bind(this.isRoot ? this.object : this.parent.value))
+    if (deep === true)
+      for (let prop of Object.keys(targetTreeNode.children)) this.register(targetTreeNode.value, prop, true)
   }
 
-  register(object, name, deep) {
-    ReactifyObjectTreeNode.register(object, name, deep)
+  /**
+   * getter for current node's value
+   */
+  get getter() {
+    return getFunction.call(this)
   }
 
-  async asyncAfterGet(returnedPromise, value) {
-    try {
-      let afterGetResult = await returnedPromise
-      return afterGetResult === undefined ? value : afterGetResult
-    } catch (e) {
-      throw e
-    }
+  /**
+   * setter for the currnet node's value
+   */
+  set setter(newValue) {
+    if (this.mode === "async")
+      throw new Error("Async mode property, should not use setter, use set or $set function to change its value.")
+    if (this.isRoot) throw Error("You cannot change the value of the top level object")
+    setFunction.call(this, this.parent.value, this.name, newValue, this.mode)
   }
 
-  async asyncBeforeGet(returnedPromise, value) {
-    try {
-      let beforeGetResult = await returnedPromise
-      if (beforeGetResult !== undefined) value = beforeGetResult
-      // call afterGetFunc
-      let afterGetResult = this.afterGet.call(this.root.value, value)
-      if (Promise.resolve(afterGetResult) === afterGetResult) return await this.asyncAfterGet(afterGetResult, value)
-      else return afterGetResult === undefined ? value : afterGetResult
-    } catch (e) {
-      throw e
-    }
+  /**
+   * get value of the property of this current node
+   * @param {String} propertyName property's name
+   */
+  get(propertyName) {
+    if (this.isLeaf)
+      throw Error("Get property value failed: current object at bottom level, which have no reactify property")
+    if (typeof propertyName !== "string") throw TypeError("Property name should be a string")
+    let treeNode = this.children[propertyName]
+    if (!treeNode)
+      throw ReferenceError(`Cannot find the property ${propertyName}, are you sure it's reactified in config?`)
+    return treeNode.getter
   }
 
-  get get() {
-    let value = this.value
-    let result = this.beforeSet.call(this.root.value)
-
-    // beforeGet return a Promise
-    if (Promise.resolve(result) === result) return this.asyncBeforeGet(result, value)
-    else if (result !== undefined) value = result
-
-    result = this.afterGet.call(this.root.value, value)
-    // afterGet reuturn a Promise
-    if (Promise.resolve(result) === result) return this.asyncAfterGet(result, value)
-    else if (result !== undefined) value = result
-
-    return value
-  }
-
-  static async set(treeNode, newValue) {
-    if (treeNode instanceof ReactifyObjectTreeNode === false)
-      throw TypeError("Set new value failed, target's $roTree should be an instanceof ReactifyObjectTreeNode")
-
-    if (treeNode.validator(newValue) === false) throw TypeError("Cannot set new value: Validation failed")
-    if (treeNode.compare(oldValue, newValue)) return
-
-    try {
-      let oldValue = treeNode.value
-      let result = await treeNode.beforeSet.call(treeNode.root.value, newValue)
-      if (result === false) return
-      treeNode.value = newValue
-      await treeNode.afterSet.call(this.root.value)
-      await treeNode.event.emit(treeNode.path, treeNode.root, newValue, oldValue).once
-    } catch (e) {
-      throw e
-    }
-  }
-
-  async set(newValue) {
-    try {
-      ReactifyObjectTreeNode.set(this, newValue)
-    } catch (e) {
-      throw e
-    }
+  /**
+   * Set value of the property of the current node
+   * @param {*} newValue
+   */
+  set(propertyName, newValue) {
+    if (this.isLeaf)
+      throw Error("Set property value failed: current object at bottom level, which have no reactify property")
+    setFunction.call(this, this.value, propertyName, newValue, this.mode)
   }
 }
 

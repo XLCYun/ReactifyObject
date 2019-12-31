@@ -12,14 +12,13 @@ function preprocess(name) {
   }
 }
 
-function process(name) {
-  if (typeof name !== "string") throw new TypeError("name for the process wrapper should be a string")
-
+function process(name, defaultFunction) {
+  if (typeof name !== "string") throw TypeError("name for the process wrapper should be a string")
+  if (typeof defaultFunction !== "function") throw TypeError("defaultFunction should be a function")
   return function(treeNode) {
     if (treeNode instanceof ReactifyObjectTreeNode.module === false)
       throw TypeError(`Process "${name}" failed: should be ReactifyObjectTreeNode`)
-
-    treeNode[name] = treeNode.config[name] || (() => {})
+    treeNode[name] = treeNode.config[name] || defaultFunction
   }
 }
 

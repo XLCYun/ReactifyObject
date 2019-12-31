@@ -1,6 +1,6 @@
 const assert = require("assert")
-const TreeNode = require("../../ReactifyObjectTree/TreeNode/TreeNode")
-const MixType = require("../helper/mixType")
+const TreeNode = require("../../../ReactifyObjectTree/TreeNode/TreeNode")
+const MixType = require("../../helper/mixType")
 const _ = require("lodash")
 
 describe("TreeNode", function() {
@@ -255,6 +255,10 @@ describe("TreeNode", function() {
         assert.equal(three.parent, two)
         assert.equal(three.children.one, undefined)
         assert.equal(three.children.two, undefined)
+
+        // set one's parent to one
+        one = new TreeNode({}, "one", null)
+        assert.ok(one.setParent(one) instanceof ReferenceError)
       })
     })
 

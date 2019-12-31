@@ -17,7 +17,7 @@ class TreeNode {
     this.name = name
     this.children = {}
     this.parent = null
-    if (parent instanceof TreeNode) this.setParent(parent)
+    if (parent !== null) this.setParent(parent)
     this.config = this.parent === null && !config.properties ? { properties: config } : config
   }
 
@@ -114,6 +114,8 @@ class TreeNode {
     track.push(this)
     return this.parent.checkCircular(track)
   }
+
+  // TODO search(name) use to search a TreeNode by name
 }
 
 module.exports = TreeNode
