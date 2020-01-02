@@ -14,6 +14,7 @@ class TreeNode {
     if (config.properties !== undefined && _.isPlainObject(config.properties) === false)
       throw new TypeError('"properties" should be an object')
 
+    this.id = _.uniqueId()
     this.name = name
     this.children = {}
     this.parent = null
@@ -27,7 +28,7 @@ class TreeNode {
    */
   get nodeType() {
     if (!this.parent) return "root"
-    return this.config.properties ? "node" : "leaf"
+    return this.config.properties || this.config.items ? "node" : "leaf"
   }
 
   /**

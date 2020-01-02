@@ -49,6 +49,10 @@ describe("properties", function() {
       properties.preprocess(treeNode)
       assert.deepEqual(treeNode.bsonType, ["object"])
     })
+
+    it("throw Error if there is both properties and items", function() {
+      assert.throws(() => new ReactifyObjectTreeNode.module({}, { a: { properties: {}, items: {} } }))
+    })
   })
   describe("process", function() {
     it("no argument, should throw Error", function() {

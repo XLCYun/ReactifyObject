@@ -15,7 +15,7 @@ function setupObjectView(object, treeNode) {
   // $roTree/$set/$register/$root
   object.$roTree = treeNode
   object.$set = treeNode.set.bind(treeNode)
-  object.$register = treeNode.register.bind(treeNode)
+  object.$register = treeNode.register.bind(treeNode) // TODO delete $register
   Object.defineProperty(object, "$root", {
     get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$root").get.bind(treeNode)
   })

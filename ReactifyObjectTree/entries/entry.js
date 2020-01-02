@@ -10,6 +10,7 @@ const afterUpdate = require("./afterUpdate")
 const mode = require("./mode")
 const init = require("./init")
 const properties = require("./properties")
+const items = require("./items")
 
 module.exports = {
   type,
@@ -23,5 +24,6 @@ module.exports = {
   afterUpdate,
   mode,
   init,
-  properties
+  properties,
+  items
 }

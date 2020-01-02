@@ -10,6 +10,10 @@ function preprocess(treeNode) {
     if (!treeNode.bsonType) treeNode.bsonType = ["object"]
     else if (treeNode.bsonType.includes("object") === false) treeNode.bsonType.push("object")
   }
+
+  // if has "preporties" and "items" throw error
+  if (treeNode.config.properties !== undefined && treeNode.config.items !== undefined)
+    throw Error("Cannot have properties and items at the same time")
 }
 
 function process(treeNode) {
@@ -22,7 +26,7 @@ function process(treeNode) {
       throw Error(`${treeNode.path} is not an "object" according the config, should not have "properties".`)
   } else if (properties !== undefined) throw Error("config or the `properties` of config should be a object")
 
-  if (treeNode.isLeaf === false) {
+  if (treeNode.isLeaf === false && treeNode.config.properties) {
     let properties = Object.keys(treeNode.config.properties)
     for (let prop of properties)
       treeNode.children[prop] = new ReactifyObjectTreeNode.module(

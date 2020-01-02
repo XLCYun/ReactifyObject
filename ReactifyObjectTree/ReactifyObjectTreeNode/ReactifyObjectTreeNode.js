@@ -64,6 +64,7 @@ class ReactifyObjectTreeNode extends TreeNode {
     return this.root.value
   }
 
+  // TODO add support of passing tree node directly
   /**
    * register the property's dependence on object[name]
    * @param {Object} object targent's parent object

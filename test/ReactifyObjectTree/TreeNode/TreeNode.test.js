@@ -48,6 +48,16 @@ describe("TreeNode", function() {
   })
 
   describe("functionality", function() {
+    it("test id", function() {
+      let collections = []
+      for (let i = 0; i < 10000; i++) collections.push(new TreeNode({}, "", null).id)
+      collections.reduce((acc, cur) => {
+        if (acc.includes(cur)) assert.fail("duplicated id: " + cur)
+        acc.push(cur)
+        return acc
+      }, [])
+    })
+
     it("test name", function() {
       let one = new TreeNode({}, "aName", null)
       assert.equal(one.name, "aName", null)
@@ -89,6 +99,12 @@ describe("TreeNode", function() {
         let one = new TreeNode({ a: {} }, "", null)
         let child = new TreeNode({}, "", one)
         assert.equal(child.nodeType, "leaf")
+      })
+
+      it("array, nodeType should be node", function() {
+        let one = new TreeNode({ a: {} }, "", null)
+        let child = new TreeNode({ items: {} }, "", one)
+        assert.equal(child.nodeType, "node")
       })
     })
 

@@ -4,6 +4,8 @@ const setupValue = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/s
 const entry = require("../../../ReactifyObjectTree/entries/entry")
 const deferRequire = require("defer-require")
 const ReactifyObjectTreeNode = deferRequire("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const setupArrayView = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupArrayView")
+const ArrayValueClass = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
 
 describe("setupValue", function() {
   let config = {
@@ -128,5 +130,14 @@ describe("setupValue", function() {
     assert.equal(test, true)
     assert.equal(treeNode.children.a.value, "good value")
     assert.equal(treeNode.value.a, "good value")
+  })
+
+  describe("this.config.items exists, will call setupArrayView", function() {
+    it("this.value will be an instance of ArrayValueClass", function() {
+      let a = treeNode.children.a
+      delete a.value
+      setupValue.call(a)
+      assert.ok(a.value, ArrayValueClass)
+    })
   })
 })
