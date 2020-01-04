@@ -76,6 +76,41 @@ describe("ArrayValueClass", function() {
     })
   })
 
+  describe("emit", function() {
+    it("eventName is not a string, throw TypeError", function() {
+      for (let i of MixType.getAll().filter(e => e !== "string")) assert.throws(() => a.emit("", i))
+    })
+
+    it("sync: will return result", function() {
+      let res = a.value.emit("result", "event name")
+      assert.equal(res, "result")
+    })
+
+    it("sync: will emit event", function() {
+      let test = false
+      a.event.on("test emit", function() {
+        test = true
+      })
+      a.value.emit("", "test emit")
+      assert.equal(test, true)
+    })
+
+    it("async: will return result", async function() {
+      let res = await a.value.emit("result", "event name")
+      assert.equal(res, "result")
+    })
+
+    it("async: will emit event", async function() {
+      let test = false
+      a.mode = "async"
+      a.event.on("test emit", async function() {
+        test = true
+      })
+      await a.value.emit("", "test emit")
+      assert.equal(test, true)
+    })
+  })
+
   describe("pop", function() {
     it("return undefined if array is empty", function() {
       a.itemSymbols = []

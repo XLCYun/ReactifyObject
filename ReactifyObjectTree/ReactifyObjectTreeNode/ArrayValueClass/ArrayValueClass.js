@@ -37,6 +37,30 @@ class ArrayValueClass extends Array {
   }
 
   /**
+   * Emit event and return result
+   * @param {any} result return result
+   * @param {string} eventName event to emit
+   * @return {Promise|any} if mode is async, return a Promise, else return the argument `result`
+   */
+  emit(result, eventName) {
+    if (typeof eventName !== "string") throw TypeError("event name should be a string")
+    let self = this
+    if (this.$roTree.mode === "sync") {
+      self.$roTree.event.emit(eventName)
+      return result
+    } else {
+      return (async function() {
+        try {
+          await self.$roTree.event.emit(eventName)
+          return result
+        } catch (e) {
+          throw e
+        }
+      })()
+    }
+  }
+
+  /**
    * pop last item of array, return undefined if array is empty
    * remove last item and return its value if if otherwise
    */
@@ -45,7 +69,7 @@ class ArrayValueClass extends Array {
     if (symbol === undefined) return undefined
     let res = this.removeChild(symbol)
     this.updateLength()
-    return res === undefined ? undefined : res.value
+    return this.emit(res === undefined ? undefined : res.value, "pop")
   }
 
   /**
@@ -57,7 +81,7 @@ class ArrayValueClass extends Array {
     if (symbol === undefined) return undefined
     let res = this.removeChild(symbol)
     this.updateLength()
-    return res === undefined ? undefined : res.value
+    return this.emit(res === undefined ? undefined : res.value, "shift")
   }
 
   /**
@@ -68,7 +92,8 @@ class ArrayValueClass extends Array {
   unshift(...addItems) {
     addItems = addItems.map(e => ArrayValueClass.addChild(this.$roTree, e)).map(e => e.symbol)
     this.$roTree.itemSymbols.unshift(...addItems)
-    return this.updateLength()
+    this.updateLength()
+    return this.emit(this.length, "unshift")
   }
 
   /**
@@ -87,7 +112,7 @@ class ArrayValueClass extends Array {
       res.push(removeRes === undefined ? undefined : removeRes.value)
     })
     this.updateLength()
-    return res
+    return this.emit(res, "splice")
   }
 
   /**
@@ -97,7 +122,8 @@ class ArrayValueClass extends Array {
   push(value) {
     let res = ArrayValueClass.addChild(this.$roTree, value)
     this.$roTree.itemSymbols.push(res.symbol)
-    return this.updateLength()
+    this.updateLength()
+    return this.emit(this.length, "push")
   }
 
   /**
@@ -109,7 +135,7 @@ class ArrayValueClass extends Array {
   copyWithin(target, start, end) {
     this.$roTree.itemSymbols.copyWithin(target, start, end)
     this.update()
-    return this
+    return this.emit(this, "copyWithin")
   }
 
   /**
@@ -118,7 +144,7 @@ class ArrayValueClass extends Array {
    */
   reverse() {
     this.$roTree.itemSymbols.reverse()
-    return this
+    return this.emit(this, "reverse")
   }
 
   /**
@@ -131,7 +157,7 @@ class ArrayValueClass extends Array {
     let treeNode = ArrayValueClass.addChild(this.$roTree, value)
     this.$roTree.itemSymbols.fill(treeNode.symbol, start, end)
     this.update()
-    return this
+    return this.emit(this, "fill")
   }
 
   /**
