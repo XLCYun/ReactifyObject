@@ -77,7 +77,6 @@ describe("ReactifyObjectTreeNode", function() {
 
       it("injectToObject", function() {
         assert.equal(object.$roTree, treeNode)
-        assert.ok(typeof object.$register === "function")
         assert.ok(typeof object.$set === "function")
         assert.equal(object.$root, treeNode.value)
         assert.equal(object.a, treeNode.children.a.value)
@@ -206,33 +205,14 @@ describe("ReactifyObjectTreeNode", function() {
 
   describe("register", function() {
     describe("argument", function() {
-      it("object is not object, throw TypeError", function() {
-        for (let i of MixType.getAll().filter(e => typeof e !== "object" && e !== null))
-          assert.throws(() => treeNode.register(i), TypeError)
-      })
-
-      it("name is not string, throw TypeError", function() {
-        for (let i of MixType.getAll().filter(e => typeof e !== "string"))
-          assert.throws(() => treeNode.register(object.a, i), TypeError)
-      })
-
       it("deep is not boolean, throw TypeError", function() {
         for (let i of MixType.getAll().filter(e => typeof e !== "boolean" && e !== undefined))
           assert.throws(() => treeNode.register(object.a, "name", i), TypeError)
       })
     })
-
-    it("object does not have a property named '$roTree', throw TypeError", function() {
-      assert.throws(() => treeNode.register({}), TypeError)
-    })
-
-    it("object.$roTree is not an instance of ReactifyObjectTreeNode, throw TypeError", function() {
-      assert.throws(() => treeNode.register({ $roTree: {} }), TypeError)
-    })
-
     describe("functionality", function() {
       it("object.$roTree does not have a child property name `name`, throw TypeError", function() {
-        assert.throws(() => treeNode2.register(treeNode.children.a, "notExistsPropertyName"))
+        assert.throws(() => treeNode2.register(treeNode.children.a.value, "notExistsPropertyName"))
       })
 
       it("after register, this.update will be called after the target property is set to a new value", function() {
@@ -241,6 +221,28 @@ describe("ReactifyObjectTreeNode", function() {
           count++
         }
         treeNode.register(object, "a", true)
+        object.a.b = 1
+        assert.equal(count, 1)
+        object.a.c = 2
+        assert.equal(count, 2)
+        object.a.b = 3
+        assert.equal(count, 3)
+        object.a.c = 4
+        assert.equal(count, 4)
+        object.a2.b2 = 5
+        assert.equal(count, 4)
+        object.a2.c2 = 6
+        assert.equal(count, 4)
+        object.a = 7
+        assert.equal(count, 5)
+      })
+
+      it("register by tree node, this.update will be called after the target property is set to a new value", function() {
+        let count = 0
+        treeNode.update = function() {
+          count++
+        }
+        treeNode.register(treeNode.children.a, true)
         object.a.b = 1
         assert.equal(count, 1)
         object.a.c = 2

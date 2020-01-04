@@ -47,17 +47,6 @@ describe("setupValue", function() {
     assert.equal(treeNode.value.a.b.c.$root, treeNode.value)
   })
 
-  it("$register", function() {
-    delete treeNode.value.$register
-    treeNode.register = function() {
-      this.testRegister = 520
-      assert.equal(this, treeNode)
-    }
-    setupValue.call(treeNode)
-    treeNode.value.$register()
-    assert.equal(treeNode.testRegister, 520)
-  })
-
   it("properties' getter", function() {
     delete treeNode.value
     let oldGet = Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "getter")

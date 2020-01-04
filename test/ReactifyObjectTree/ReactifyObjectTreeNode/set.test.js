@@ -8,13 +8,14 @@ const MixType = require("../../helper/mixType")
 describe("set.js", function() {
   let config = {
     a: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } },
-    a2: {}
+    a2: {},
+    a3: { items: {} }
   }
   let object = {}
   let treeNode = undefined
 
   beforeEach(function() {
-    object = { a: { b: { c: {}, c2: "I am c2" }, b2: "I am b2" }, a2: "I am a2" }
+    object = { a: { b: { c: {}, c2: "I am c2" }, b2: "I am b2" }, a2: "I am a2", a3: [0, 1] }
     treeNode = new ReactifyObjectTreeNode.module(object, config, "", null)
   })
 
@@ -41,10 +42,26 @@ describe("set.js", function() {
       treeNode.children.a2.value = "a2"
       let promise = set(treeNode.value, "a2", "new value", "async")
       await assert.doesNotReject(promise, "set to 'async' should not throw Error, caused by other Error is passible")
+
+      assert.throws(() => set(treeNode.value, "a", ""))
     })
   })
 
   describe("functionality", function() {
+    it("set a new value", function() {
+      set(object, "a2", 0, "sync")
+      assert.equal(object.a2, 0)
+
+      set(treeNode.children.a2, 1, "sync")
+      assert.equal(object.a2, 1)
+
+      set(treeNode.children.a3.value, 0, "a3[0]", "sync")
+      assert.equal(object.a3[0], "a3[0]")
+
+      set(treeNode.children.a3.value, 1, "a3[1]", "sync")
+      assert.equal(object.a3[1], "a3[1]")
+    })
+
     it("property does not exists, throw ReferenceError", function() {
       assert.throws(() => set(treeNode.value, "notExistsPropertyName", "", "sync"))
     })
@@ -211,7 +228,7 @@ describe("set.js", function() {
         assert.ok(test)
       })
 
-      it("beforeSet is called, first argument is new value, second argument is current value",async function() {
+      it("beforeSet is called, first argument is new value, second argument is current value", async function() {
         let test = false
         treeNode.children.a2.beforeSet = async function(newValue, oldValue) {
           assert.equal(newValue, "new value")
@@ -222,7 +239,7 @@ describe("set.js", function() {
         assert.ok(test)
       })
 
-      it("afterSet is called, first argument is new value, second argument is old value",async function() {
+      it("afterSet is called, first argument is new value, second argument is old value", async function() {
         let test = false
         treeNode.children.a2.afterSet = async function(newValue, oldValue) {
           assert.equal(newValue, "new value")
@@ -232,7 +249,6 @@ describe("set.js", function() {
         await set(treeNode.value, "a2", "new value", "async")
         assert.ok(test)
       })
-
 
       it("beforeSet return false, will abort the set function", async function() {
         treeNode.children.a2.value = "a2 value"

@@ -13,19 +13,22 @@ const ReactifyObjectTreeNode = deferRequire("./ReactifyObjectTreeNode.js")
  */
 function getTreeNode(object, index) {
   if (object instanceof ReactifyObjectTreeNode.module) return object
-  // TODO 添加数组相关的判断
-  if (_.isObject(object) === false) throw TypeError(`Invalid argument, first argument should be a Array or Object`)
-  if (_.isArray(object)) {
-    if (_.isNumber(index) === false)
-      throw TypeError(`Invalid index argument, should be a number when object is an array`)
-  } else if (_.isString(index) === false)
-    throw TypeError(`Invalid index argument, should be a string when object is not an array`)
+  if (!object) throw TypeError("object is not accessible, cannot get its tree node.")
 
   let $roTree = object.$roTree
   if ($roTree instanceof ReactifyObjectTreeNode.module === false)
     throw TypeError("Cannot find the ReactifyObjectTreeNode($roTree) of the object")
+
+  if (!$roTree.config.items && !$roTree.config.properties)
+    throw ReferenceError(`${$roTree.path} does not have reactify property`)
+  if ($roTree.config.properties && typeof index !== "string") throw TypeError("property's name should be string")
+  if ($roTree.config.items && typeof index !== "number") throw TypeError("array's index should be number")
+
+  if ($roTree.config.items) index = $roTree.itemSymbols[index]
   let treeNode = $roTree.children[index]
-  if (!treeNode) throw ReferenceError(`get property value failed: property does not exist`)
+
+  if (!treeNode) throw ReferenceError(`get property's tree node failed: property ${index} does not exist`)
+
   return treeNode
 }
 

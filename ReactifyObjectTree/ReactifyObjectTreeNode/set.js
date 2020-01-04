@@ -40,8 +40,6 @@ async function setAsync(treeNode, newValue) {
   }
 }
 
-// TODO add supoort of passing tree node directly
-// TODO add support of passing array and index
 /**
  * According mode to call setSync or setAsync function
  * to set a new value to the target property
@@ -51,17 +49,12 @@ async function setAsync(treeNode, newValue) {
  * @param {String} mode "async" or "sync"
  */
 function set(object, index, newValue, mode) {
-  if (!object) throw TypeError("set property value failed: invalid reactify object")
-  let parentTreeNode = object.$roTree
-  if (parentTreeNode instanceof ReactifyObjectTreeNode.module === false)
-    throw TypeError("Cannot find the ReactifyObjectTreeNode($roTree) of the object")
-  if (parentTreeNode.config.properties && typeof index !== "string") throw TypeError("property's name should be string")
-  if (parentTreeNode.config.items && typeof index !== "number") throw TypeError("array's index should be number")
+  let treeNode = getTreeNode(object, index)
+  if (treeNode === object) {
+    mode = newValue
+    newValue = index
+  }
   if (mode !== "sync" && mode !== "async") throw Error("mode has to be 'async' or 'sync'")
-
-  if (parentTreeNode.config.items) index = parentTreeNode.itemSymbols[index]
-  let treeNode = parentTreeNode.children[index]
-  if (!treeNode) throw ReferenceError(`Set property value failed: property ${index} not exists`)
 
   if (treeNode.validator(newValue) === false) throw TypeError("Cannot set new value: Validation failed")
   if (treeNode.compare(treeNode.value, newValue)) return

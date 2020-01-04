@@ -115,7 +115,6 @@ class TreeNode {
     track.push(this)
     return this.parent.checkCircular(track)
   }
-
   // TODO search(name) use to search a TreeNode by name
 }
 

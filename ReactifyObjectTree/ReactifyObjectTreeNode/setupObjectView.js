@@ -12,10 +12,9 @@ function setupObjectView(object, treeNode) {
   if (treeNode instanceof ReactifyObjectTreeNode.module === false)
     throw TypeError("Invalid treeNode, should be an instance of ReactifyObjectTreeNode")
 
-  // $roTree/$set/$register/$root
+  // $roTree/$set/$root
   object.$roTree = treeNode
   object.$set = treeNode.set.bind(treeNode)
-  object.$register = treeNode.register.bind(treeNode) // TODO delete $register
   Object.defineProperty(object, "$root", {
     get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$root").get.bind(treeNode)
   })

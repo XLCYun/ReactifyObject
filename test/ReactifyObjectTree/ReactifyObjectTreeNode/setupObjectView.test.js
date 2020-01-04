@@ -55,16 +55,6 @@ describe("setupObjectView", function() {
     assert.equal(setupObject.$root, treeNode.value)
   })
 
-  it("$register", function() {
-    treeNode.register = function() {
-      this.testRegister = 520
-      assert.equal(this, treeNode)
-    }
-    setupObjectView(setupObject, treeNode)
-    setupObject.$register()
-    assert.equal(treeNode.testRegister, 520)
-  })
-
   it("properties' getter", function() {
     let oldGet = Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "getter")
     Object.defineProperty(ReactifyObjectTreeNode.module.prototype, "getter", {

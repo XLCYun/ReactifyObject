@@ -6,6 +6,7 @@ const injectToObject = require("./injectToObject")
 const setFunction = require("./set")
 const getFunction = require("./get")
 const EventMan = require("@xlcyun/event-man")
+const getTreeNode = require("./getTreeNode")
 
 class ReactifyObjectTreeNode extends TreeNode {
   constructor(object, config, name, parent) {
@@ -64,26 +65,17 @@ class ReactifyObjectTreeNode extends TreeNode {
     return this.root.value
   }
 
-  // TODO add support of passing tree node directly
   /**
    * register the property's dependence on object[name]
    * @param {Object} object targent's parent object
-   * @param {String} name targent's name in its parent
+   * @param {String} index targent's name in its parent
    * @param {Boolean} deep if true, register the dependences to its children as well
    */
-  register(object, name, deep = false) {
-    if (_.isObject(object) === false) throw TypeError(`Register failed: Invalid object, received ${object}`)
-    if (_.isString(name) === false) throw TypeError("Register failed: name should be a string")
+  register(object, index, deep = false) {
     if (_.isBoolean(deep) === false) throw TypeError("Register failed: deep should be a boolean")
 
-    if (object.$roTree instanceof ReactifyObjectTreeNode === false)
-      throw TypeError("Cannot find $roTree in target object, are you sure it's reactified in config object?")
-
-    let targetTreeNode = object.$roTree.children[name]
-    if (targetTreeNode instanceof ReactifyObjectTreeNode === false)
-      throw TypeError(
-        `Register failed: canot find ${name} in ${object.$roTree.path}, are you sure it's reactified in config object?`
-      )
+    let targetTreeNode = getTreeNode(object, index)
+    if (targetTreeNode === object) deep = index
 
     targetTreeNode.event.on("afterSet", this.update.bind(this.isRoot ? this.object : this.parent.value))
     if (deep === true)

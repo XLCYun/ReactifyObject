@@ -41,15 +41,6 @@ describe("injectToObject", function() {
     object.$set("a2", "a2")
     assert.equal(object.a2, "a2")
 
-    let test = false
-    treeNode.update = function() {
-      test = true
-      assert.equal(this.a2, "new a2")
-    }
-    object.$register(object, "a2")
-    object.a2 = "new a2"
-    assert.equal(test, true)
-
     assert.equal(object.$roTree, treeNode)
   })
 })

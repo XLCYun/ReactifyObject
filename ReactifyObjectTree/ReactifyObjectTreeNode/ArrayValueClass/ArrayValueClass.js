@@ -21,7 +21,7 @@ class ArrayValueClass extends Array {
 
     if (_.isArray(treeNode.itemSymbols) === false) throw TypeError(msg)
 
-    // $roTree/$set/$register/$root
+    // $roTree/$set/$root
     this.$roTree = treeNode
     treeNode.value = this
     this.$set = treeNode.set.bind(treeNode)
