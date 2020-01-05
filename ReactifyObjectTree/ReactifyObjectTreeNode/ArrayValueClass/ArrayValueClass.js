@@ -46,12 +46,12 @@ class ArrayValueClass extends Array {
     if (typeof eventName !== "string") throw TypeError("event name should be a string")
     let self = this
     if (this.$roTree.mode === "sync") {
-      self.$roTree.event.emit(eventName)
+      self.$roTree.event.emit(eventName, result).once
       return result
     } else {
       return (async function() {
         try {
-          await self.$roTree.event.emit(eventName)
+          await self.$roTree.event.emit(eventName, result).once
           return result
         } catch (e) {
           throw e

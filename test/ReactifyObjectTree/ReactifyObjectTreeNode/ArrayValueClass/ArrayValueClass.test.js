@@ -95,6 +95,16 @@ describe("ArrayValueClass", function() {
       assert.equal(test, true)
     })
 
+    it("Listener will get the result as the first argument", function() {
+      let test = false
+      a.event.on("test emit", function(result) {
+        test = true
+        assert.equal(result, "test emit result")
+      })
+      a.value.emit("test emit result", "test emit").once
+      assert.ok(test)
+    })
+
     it("async: will return result", async function() {
       let res = await a.value.emit("result", "event name")
       assert.equal(res, "result")
@@ -108,6 +118,16 @@ describe("ArrayValueClass", function() {
       })
       await a.value.emit("", "test emit")
       assert.equal(test, true)
+    })
+
+    it("Async, listener will get the result as the first argument", async function() {
+      let test = false
+      a.event.on("test emit", async function(result) {
+        test = true
+        assert.equal(result, "test emit result")
+      })
+      await a.value.emit("test emit result", "test emit").once
+      assert.ok(test)
     })
   })
 
