@@ -1,6 +1,6 @@
 {
   "name": "reactify-object",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A useful tool use to reactify object by injecting functions and properties into object according the given configuration. ",
   "main": "ReactifyObject.js",
   "scripts": {
