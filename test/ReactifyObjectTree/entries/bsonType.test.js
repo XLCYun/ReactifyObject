@@ -1,7 +1,9 @@
 require("mocha")
 const assert = require("assert")
 const defer_require = require("defer-require")
-const ReactifyObjectTreeNode = defer_require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = defer_require(
+  "../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
+)
 const mixType = require("../../helper/mixType")
 
 const bsonType = require("../../../ReactifyObjectTree/entries/bsonType")
@@ -141,6 +143,29 @@ describe("bsonType", function() {
       assert.ok(propTreeNode.compare(true, true))
       assert.ok(!propTreeNode.compare(true, false))
       assert.ok(propTreeNode.compare(false, false))
+    })
+
+    it("config has a clone, yet not function", function() {
+      propTreeNode.config.clone = 0
+      assert.throws(() => bsonType.process(propTreeNode), TypeError, "should throw TypeError, yet not.")
+    })
+
+    it("config has a clone, and it is a function, should attach to treeNode", function() {
+      propTreeNode.config.clone = function() {
+        return "test"
+      }
+      assert.doesNotThrow(() => bsonType.process(propTreeNode), TypeError, "should not throw TypeError, yet did.")
+      assert.equal(propTreeNode.clone, propTreeNode.config.clone)
+      assert.equal(propTreeNode.clone(), "test")
+    })
+
+    it("config has not compare, use bsonType to generate a validator", function() {
+      propTreeNode.bsonType = ["string", "bool"]
+      bsonType.process(propTreeNode)
+      assert.equal(propTreeNode.clone("hello"), "hello")
+      assert.equal(propTreeNode.clone(""), "")
+      assert.equal(propTreeNode.clone(true), true)
+      assert.equal(propTreeNode.clone(false), false)
     })
   })
 })

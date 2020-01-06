@@ -2,6 +2,7 @@ const validator = require("../../validator/validator")
 const compare = require("../../compare/compare")
 const defer_require = require("defer-require")
 const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const clone = require("../../clone/clone")
 
 function preprocess(treeNode) {
   if (treeNode instanceof ReactifyObjectTreeNode.module === false)
@@ -31,6 +32,11 @@ function process(treeNode) {
     if (typeof treeNode.config.compare === "function") treeNode.compare = treeNode.config.compare
     else throw TypeError(`"compare" should be a function`)
   } else treeNode.compare = (v1, v2) => compare.compare(v1, v2, treeNode.bsonType)
+
+  if (treeNode.config.clone !== undefined) {
+    if (typeof treeNode.config.clone === "function") treeNode.clone = treeNode.config.clone
+    else throw TypeError(`"clone" should be a function`)
+  } else treeNode.clone = v => clone.clone(v, treeNode.bsonType)
 }
 
 module.exports = {
