@@ -1,5 +1,5 @@
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode.js")
+const ReactifyObjectTreeNode = deferRequire("../ReactifyObjectTreeNode.js")
 
 /**
  * setup a object view, that is inject the getter and setter

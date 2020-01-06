@@ -1,10 +1,10 @@
 const _ = require("lodash")
 const assert = require("assert")
-const setupArrayView = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupArrayView")
+const setupArrayView = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupArrayView")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
-const mixType = require("../../helper/mixType")
-const ArrayValueClass = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
+const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const mixType = require("../../../helper/mixType")
+const ArrayValueClass = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
 
 describe("setupArrayView", function() {
   let config = undefined

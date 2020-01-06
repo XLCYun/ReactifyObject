@@ -1,6 +1,6 @@
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode.js")
-const ArrayValueClass = require("./ArrayValueClass/ArrayValueClass")
+const ReactifyObjectTreeNode = deferRequire("../ReactifyObjectTreeNode.js")
+const ArrayValueClass = require("../ArrayValueClass/ArrayValueClass")
 
 /**
  * setup a array view as value

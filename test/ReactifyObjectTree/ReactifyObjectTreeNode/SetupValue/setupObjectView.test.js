@@ -1,9 +1,9 @@
 const _ = require("lodash")
 const assert = require("assert")
-const setupObjectView = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupObjectView")
+const setupObjectView = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupObjectView")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
-const mixType = require("../../helper/mixType")
+const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const mixType = require("../../../helper/mixType")
 
 describe("setupObjectView", function() {
   let config = {

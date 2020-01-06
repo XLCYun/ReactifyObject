@@ -1,11 +1,9 @@
 const _ = require("lodash")
 const assert = require("assert")
-const setupValue = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupValue")
-const entry = require("../../../ReactifyObjectTree/entries/entry")
+const setupValue = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupValue/setupValue")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
-const setupArrayView = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupArrayView")
-const ArrayValueClass = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
+const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ArrayValueClass = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
 
 describe("setupValue", function() {
   let config = {

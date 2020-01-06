@@ -1,6 +1,4 @@
-const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("./ReactifyObjectTreeNode.js")
-const setupObjectView = require("./setupObjectView")
+const setupObjectView = require("./SetupValue/setupObjectView")
 
 /**
  * Inject object view to top level object.
