@@ -87,6 +87,13 @@ describe("clone", function() {
       it("empty typeError", function() {
         assert.equal(clone.typeFilter([]).length, 0)
       })
+
+      it("invalid type, throw Error", function() {
+        let oldFunc = validator.functions.string
+        validator.functions.string = () => false
+        assert.throws(() => clone.clone("test string", ["string"]))
+        validator.functions.string = oldFunc
+      })
     })
   })
 

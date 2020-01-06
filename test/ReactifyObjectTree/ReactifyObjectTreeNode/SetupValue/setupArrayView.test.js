@@ -2,7 +2,9 @@ const _ = require("lodash")
 const assert = require("assert")
 const setupArrayView = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupArrayView")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = deferRequire(
+  "../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
+)
 const mixType = require("../../../helper/mixType")
 const ArrayValueClass = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
 
@@ -28,8 +30,8 @@ describe("setupArrayView", function() {
     a = treeNode.children.a
   })
 
-  it("if treeNode is an instance of ReactifyObjectTreeNode, throw Error", function() {
-    for (let i of mixType.getAll()) assert.throws(() => setupArrayView(i))
+  it("if treeNode is an instance of ReactifyObjectTreeNode, throw TypeError", function() {
+    for (let i of mixType.getAll()) assert.throws(() => setupArrayView(i), TypeError)
   })
 
   it("value will be an instance of ArrayValueClass", function() {

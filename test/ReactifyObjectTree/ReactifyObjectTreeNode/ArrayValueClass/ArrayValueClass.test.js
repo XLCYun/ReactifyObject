@@ -78,7 +78,8 @@ describe("ArrayValueClass", function() {
 
   describe("emit", function() {
     it("eventName is not a string, throw TypeError", function() {
-      for (let i of MixType.getAll().filter(e => e !== "string")) assert.throws(() => a.emit("", i))
+      for (let i of MixType.getAll().filter(e => typeof e !== "string"))
+        assert.throws(() => object.a.emit("", i), TypeError)
     })
 
     it("sync: will return result", function() {
@@ -105,7 +106,19 @@ describe("ArrayValueClass", function() {
       assert.ok(test)
     })
 
+    it("listener will throw error", function() {
+      let test = false
+      a.event.on("test emit", function(result) {
+        test = true
+        assert.equal(result, "test emit result")
+        throw Error()
+      })
+      assert.throws(() => a.value.emit("test emit result", "test emit"))
+      assert.ok(test)
+    })
+
     it("async: will return result", async function() {
+      a.mode = "async"
       let res = await a.value.emit("result", "event name")
       assert.equal(res, "result")
     })
@@ -121,12 +134,25 @@ describe("ArrayValueClass", function() {
     })
 
     it("Async, listener will get the result as the first argument", async function() {
+      a.mode = "async"
       let test = false
       a.event.on("test emit", async function(result) {
         test = true
         assert.equal(result, "test emit result")
       })
       await a.value.emit("test emit result", "test emit").once
+      assert.ok(test)
+    })
+
+    it("Async, listener will throw error", async function() {
+      a.mode = "async"
+      let test = false
+      a.event.on("test emit", async function(result) {
+        test = true
+        assert.equal(result, "test emit result")
+        throw Error()
+      })
+      assert.rejects(a.value.emit("test emit result", "test emit"))
       assert.ok(test)
     })
   })

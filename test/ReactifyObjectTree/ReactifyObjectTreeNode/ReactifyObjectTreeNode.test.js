@@ -396,6 +396,23 @@ describe("ReactifyObjectTreeNode", function() {
     })
   })
 
+  describe("toObject", function() {
+    it("argument, clone is not boolean", function() {
+      for (let i of MixType.getAll().filter(e => typeof e !== "boolean" && e !== undefined))
+        assert.throws(() => treeNode.toObject(i), TypeError)
+    })
+
+    it("functionality", function() {
+      assert.deepEqual(treeNode.toObject(), { a: { b: "b", c: "c" }, a2: { b2: "b2", c2: "c2" } })
+      assert.deepEqual(treeNode.children.a.toObject(), { b: "b", c: "c" })
+      assert.deepEqual(treeNode.children.a.children.b.toObject(), "b")
+      assert.deepEqual(treeNode.children.a.children.c.toObject(), "c")
+      assert.deepEqual(treeNode.children.a2.toObject(), { b2: "b2", c2: "c2" })
+      assert.deepEqual(treeNode.children.a2.children.b2.toObject(), "b2")
+      assert.deepEqual(treeNode.children.a2.children.c2.toObject(), "c2")
+    })
+  })
+
   it("a2 reflect to a1, using update and init in config", function() {
     let config = {
       a: {

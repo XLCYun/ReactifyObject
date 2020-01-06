@@ -7,6 +7,7 @@ const setFunction = require("./set")
 const getFunction = require("./get")
 const EventMan = require("@xlcyun/event-man")
 const getTreeNode = require("./getTreeNode")
+const toObject = require("./toObject")
 
 class ReactifyObjectTreeNode extends TreeNode {
   constructor(object, config, name, parent) {
@@ -121,6 +122,17 @@ class ReactifyObjectTreeNode extends TreeNode {
     if (this.isLeaf)
       throw Error("Set property value failed: current object at bottom level, which have no reactify property")
     setFunction.call(this, this.value, propertyName, newValue, this.mode)
+  }
+
+  /**
+   * Convert this reactify tree to an objectg
+   * @param {Boolean} clone use clone function to clone property
+   */
+  toObject(clone = false) {
+    if (typeof clone !== "boolean") throw TypeError("argument `clone` should be boolean")
+    let res = {}
+    toObject.call(this, res, clone)
+    return res[this.name]
   }
 }
 

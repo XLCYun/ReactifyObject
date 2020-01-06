@@ -30,7 +30,7 @@ describe("setupObjectView", function() {
   })
 
   it("two argument, invalid treeNode, should throw TypeError", function() {
-    for (let i of mixType.getAll()) assert.throws(() => setupObjectView(i), TypeError)
+    for (let i of mixType.getAll()) assert.throws(() => setupObjectView({}, i), TypeError)
   })
 
   it("$roTree", function() {
