@@ -1,13 +1,16 @@
 const _ = require("lodash")
 const TreeNode = require("../TreeNode/TreeNode")
 const processConfig = require("./processConfig")
-const setupValue = require("./setupValue/setupValue")
+const setupValue = require("./SetupValue/setupValue")
 const injectToObject = require("./injectToObject")
 const setFunction = require("./set")
 const getFunction = require("./get")
 const EventMan = require("@xlcyun/event-man")
 const getTreeNode = require("./getTreeNode")
 const toObject = require("./toObject")
+const ArrayValueClass = require("./ArrayValueClass/ArrayValueClass")
+const getTreeNodeByPath = require("./getTreeNodeByPath")
+const revision = require("../revision/revision")
 
 class ReactifyObjectTreeNode extends TreeNode {
   constructor(object, config, name, parent) {
@@ -34,6 +37,10 @@ class ReactifyObjectTreeNode extends TreeNode {
     })
     // Root node triggers 'init' event
     if (this.isRoot) this.event.emit("init", this).once
+  }
+
+  setupRevision(generateRevisionInfoFunction) {
+    this.revision = new revision(this, generateRevisionInfoFunction)
   }
 
   /**
@@ -64,6 +71,47 @@ class ReactifyObjectTreeNode extends TreeNode {
    */
   get $root() {
     return this.root.value
+  }
+
+  /**
+   * return true if this a array node
+   */
+  get isArrayNode() {
+    return this.isLeaf ? false : this.value instanceof ArrayValueClass ? true : false
+  }
+
+  /**
+   * Return true if this is a object node
+   */
+  get isObjectNode() {
+    return this.isLeaf ? false : this.value instanceof ArrayValueClass ? false : true
+  }
+
+  /**
+   * get a tree node by path
+   * @param {string} path path to located tree node
+   */
+  getTreeNodeByPath(path) {
+    if (typeof path !== "string") throw TypeError("path should be a string")
+    path = path.split(".")
+    if (path[0] !== this.name) return undefined
+    if (path.length === 1) return this
+    return getTreeNodeByPath.call(this, path.slice(1, path.length))
+  }
+
+  /**
+   * return the parent of target tree node even if the target not exists
+   * @param {string} path path to located the tree node
+   * @return {ReactifyObjectTreeNode|undefined} if the parent of the target tree node exists, return it, else return undefined
+   */
+  getParentTreeNodeByPath(path) {
+    if (typeof path !== "string") throw TypeError("path should be a string")
+    path = path.split(".")
+    if (path.length === 1) return undefined
+    path = path.slice(0, path.length - 1)
+    let result = this.getTreeNodeByPath(path.join("."))
+    if (result instanceof ReactifyObjectTreeNode && result.isLeaf) return undefined
+    return result
   }
 
   /**
@@ -121,7 +169,7 @@ class ReactifyObjectTreeNode extends TreeNode {
   set(propertyName, newValue) {
     if (this.isLeaf)
       throw Error("Set property value failed: current object at bottom level, which have no reactify property")
-    setFunction.call(this, this.value, propertyName, newValue, this.mode)
+    return setFunction.call(this, this.value, propertyName, newValue)
   }
 
   /**
@@ -133,6 +181,42 @@ class ReactifyObjectTreeNode extends TreeNode {
     let res = {}
     toObject.call(this, res, clone)
     return res[this.name]
+  }
+
+  /**
+   * Use `object` to update value of this tree
+   * To change an array, use: [start, deleteCount, ...pushItems] to manipulate its elements
+   * Or use: {[[index]]: newValue} to change the value of the element located by index
+   * @param {Any} object object to update
+   * @return {Generator} return a generator which will yield the every result of every set operation
+   */
+  *setSequence(object) {
+    if (this.isLeaf) {
+      yield this.parent.set(this.name, object)
+      return
+    }
+    if (this.isArrayNode) {
+      if (_.isObject(object) === false)
+        throw TypeError(`Set operation failed: new value for ${this.path} should be an object or array`)
+      // [start, deleteCount, ...pushItems]
+      if (_.isArray(object)) yield this.value.splice(object[0], object[1], ...object.slice(2, object.length))
+      // { [[index]]: newValue }
+      else
+        for (let key of Object.keys(object)) {
+          let index = _.toInteger(key)
+          if (index.toString() !== key) throw TypeError(`Invalid index: ${key}, should be a integer`)
+          let node = this.value.getTreeNodeByIndex(index)
+          for (let seq of node.setSequence(object[key])) yield seq
+        }
+    } else {
+      if (_.isObject(object) === false)
+        throw TypeError(`Set operation failed: new value for ${this.path} should be an object`)
+      for (let prop of Object.keys(object)) {
+        if (!this.children[prop])
+          throw ReferenceError(`Set operation failed: ${this.path}.${prop} doesn't exist in reactify object`)
+        for (let seq of this.children[prop].setSequence(object[prop])) yield seq
+      }
+    }
   }
 }
 

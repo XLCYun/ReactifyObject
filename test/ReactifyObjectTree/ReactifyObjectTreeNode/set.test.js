@@ -33,7 +33,8 @@ describe("set.js", function() {
     })
 
     it("invalid mode, throw Error", async function() {
-      for (let i of MixType.getAll()) assert.throws(() => set(treeNode.value, "", "", i))
+      for (let i of MixType.getAll().filter(e => e !== undefined)) assert.throws(() => set(treeNode.value, "a2", "", i))
+
       treeNode.children.a2.value = "a2"
       assert.doesNotThrow(
         () => set(treeNode.value, "a2", "new value", "sync"),
@@ -42,8 +43,6 @@ describe("set.js", function() {
       treeNode.children.a2.value = "a2"
       let promise = set(treeNode.value, "a2", "new value", "async")
       await assert.doesNotReject(promise, "set to 'async' should not throw Error, caused by other Error is passible")
-
-      assert.throws(() => set(treeNode.value, "a", ""))
     })
   })
 

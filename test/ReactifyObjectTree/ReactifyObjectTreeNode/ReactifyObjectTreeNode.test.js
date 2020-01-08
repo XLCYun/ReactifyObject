@@ -4,6 +4,7 @@ const EventMan = require("@xlcyun/event-man")
 const ReactifyObjectTreeNode = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 const MixType = require("../../helper/mixType")
 const entry = require("../../../ReactifyObjectTree/entries/entry")
+const revision = require("../../../ReactifyObjectTree/revision/revision")
 
 describe("ReactifyObjectTreeNode", function() {
   let config = {
@@ -14,11 +15,56 @@ describe("ReactifyObjectTreeNode", function() {
   let object2 = {}
   let treeNode = undefined
   let treeNode2 = undefined
+  let arrayConfig = undefined
+  let arrayObject = undefined
+  let arrayTreeNode = undefined
+  let asyncConfig = undefined
+  let asyncObject = undefined
+  let asyncTreeNode = undefined
   beforeEach(function() {
     object = { a: { b: "b", c: "c" }, a2: { b2: "b2", c2: "c2" } }
     object2 = { a: { b: "b", c: "c" }, a2: { b2: "b2", c2: "c2" } }
     treeNode = new ReactifyObjectTreeNode(object, config, "", null)
     treeNode2 = new ReactifyObjectTreeNode(object2, config, "", null)
+
+    arrayConfig = {
+      a: { items: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } } },
+      a2: { mode: "sync" }
+    }
+    arrayObject = {
+      a: [
+        { b: { c: {}, c2: "I am c2" }, b2: "I am b2" },
+        { b: { c: {}, c2: "I am c22" }, b2: "I am b22" }
+      ],
+      a2: "I am a2"
+    }
+    arrayTreeNode = new ReactifyObjectTreeNode(arrayObject, arrayConfig, "", null)
+    a = arrayTreeNode.children.a
+
+    asyncConfig = {
+      a: {
+        mode: "async",
+        items: {
+          mode: "async",
+          properties: {
+            b: {
+              mode: "async",
+              properties: { c: { mode: "async", properties: {} }, c2: { mode: "async" } }
+            },
+            b2: { mode: "async" }
+          }
+        }
+      },
+      a2: { mode: "async" }
+    }
+    asyncObject = {
+      a: [
+        { b: { c: {}, c2: "I am c2" }, b2: "I am b2" },
+        { b: { c: {}, c2: "I am c22" }, b2: "I am b22" }
+      ],
+      a2: "I am a2"
+    }
+    asyncTreeNode = new ReactifyObjectTreeNode(asyncObject, asyncConfig, "", null)
   })
 
   describe("constructor", function() {
@@ -150,6 +196,27 @@ describe("ReactifyObjectTreeNode", function() {
     })
   })
 
+  describe("setupRevision", function() {
+    it("before setupRevision, revision should be undefined", function() {
+      assert.equal(undefined, treeNode.revision)
+    })
+
+    it("after setupRevision, revision should be an instance of revision", function() {
+      treeNode.setupRevision()
+      assert.ok(treeNode.revision instanceof revision)
+    })
+
+    it("after setupRevision, revision.tree is treeNode", function() {
+      treeNode.setupRevision()
+      assert.equal(treeNode.revision.tree, treeNode)
+    })
+
+    it("setupRevision with a function to generate revision info", function() {
+      treeNode.setupRevision(() => "test setupRevision")
+      assert.equal(treeNode.revision.revisionInfoFunc(), "test setupRevision")
+    })
+  })
+
   describe("setParent", function() {
     it("invalid argument", function() {
       for (let i of MixType.getAll()) assert.throws(() => treeNode.setParent(i), TypeError)
@@ -188,6 +255,154 @@ describe("ReactifyObjectTreeNode", function() {
     })
   })
 
+  describe("isArrayNode", function() {
+    it("{a: items: ..., a2}", function() {
+      assert.ok(a.isArrayNode)
+    })
+
+    it("{a: {items:{}}}", function() {
+      let config = { a: { items: {} } }
+      let object = { a: [1, 2, 3] }
+      let treeNode = new ReactifyObjectTreeNode(object, config, "", null)
+      assert.ok(treeNode.children.a.isArrayNode)
+      treeNode.children.a.value = 3
+      assert.ok(!treeNode.children.a.isArrayNode)
+    })
+
+    it("test a leaf is not array node", function() {
+      assert.ok(!treeNode.children.a.children.b.isArrayNode)
+    })
+  })
+
+  describe("isObjectNode", function() {
+    it("isObjectNode", function() {
+      assert.ok(treeNode.isObjectNode)
+      assert.ok(treeNode.children.a.isObjectNode)
+      assert.ok(treeNode.children.a2.isObjectNode)
+      assert.ok(!treeNode.children.a.children.b.isObjectNode)
+      assert.ok(!treeNode.children.a.children.c.isObjectNode)
+      assert.ok(!treeNode.children.a2.children.b2.isObjectNode)
+      assert.ok(!treeNode.children.a2.children.c2.isObjectNode)
+      assert.ok(!a.isObjectNode)
+    })
+  })
+
+  describe("getTreeNodeByPath", function() {
+    it("path is not string, throw TypeError", function() {
+      for (let i of MixType.getAll().filter(e => typeof e !== "string")) assert.throws(() => a.getTreeNodeByPath(i))
+    })
+
+    it("return target treeNode", function() {
+      let res = a.getTreeNodeByPath("a.0")
+      assert.equal(res, a.value[0].$roTree)
+    })
+
+    it("Target tree node is itself", function() {
+      let res = a.getTreeNodeByPath("a")
+      assert.equal(res, a)
+    })
+
+    it("not exists, return undefined", function() {
+      let res = a.getTreeNodeByPath("b.0")
+      assert.equal(res, undefined)
+    })
+  })
+
+  describe("getParentTreeNodeByPath", function() {
+    it("path is not string, throw TypeError", function() {
+      for (let i of MixType.getAll().filter(e => typeof e !== "string"))
+        assert.throws(() => a.getParentTreeNodeByPath(i))
+    })
+    it("path has not . inside, and not equal to root's name, return undefined", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath(""))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("Not Root's Name"))
+    })
+    it("path has not . inside, and it's root's name, still return undefined", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root"))
+    })
+    it("path has . inside, but first one is not root's name, still return undefined", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("NotRoot.a"))
+    })
+    it("path has . inside, but first one is root's name, target node not exists, still return root", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(arrayTreeNode, arrayTreeNode.getParentTreeNodeByPath("$root.notExist"))
+    })
+    it("target node not exists, parent is leaf, return undefined", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b2.notExist"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c2.notExist"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b2.notExist"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c2.notExist"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a2.notExist"))
+    })
+    it("target node not exists, parent is not leaf, return parent", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(arrayObject.a.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.notExist"))
+      assert.equal(arrayObject.a[0].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.notExist"))
+      assert.equal(arrayObject.a[0].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.notExist"))
+      assert.equal(arrayObject.a[0].b.c.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c.notExist"))
+      assert.equal(arrayObject.a[1].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.notExist"))
+      assert.equal(arrayObject.a[1].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.notExist"))
+      assert.equal(arrayObject.a[1].b.c.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c.notExist"))
+    })
+    it("target node exists, parent exists, return parent", function() {
+      arrayTreeNode.name = "$root"
+      assert.equal(arrayTreeNode, arrayTreeNode.getParentTreeNodeByPath("$root.a"))
+      assert.equal(arrayTreeNode, arrayTreeNode.getParentTreeNodeByPath("$root.a2"))
+      assert.equal(arrayObject.a[0].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b"))
+      assert.equal(arrayObject.a[0].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b2"))
+      assert.equal(arrayObject.a[0].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c"))
+      assert.equal(arrayObject.a[0].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c2"))
+      assert.equal(arrayObject.a[1].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b"))
+      assert.equal(arrayObject.a[1].$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b2"))
+      assert.equal(arrayObject.a[1].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c"))
+      assert.equal(arrayObject.a[1].b.$roTree, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c2"))
+    })
+    it("target node not exists, parent not exists, return undefined", function() {
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("notExist.a"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("notExist.a2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("notExist.notExist2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.notExist.a"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.notExist.a2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.notExist.a"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.notExist.a2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.2.notExist.a"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.2.notExist.a2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.2.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.notExist.b"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.notExist.b2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.notExist.b"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.notExist.b2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b.c.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b.c.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b2.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b2.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.0.b2.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b2.notExist.c"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b2.notExist.c2"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a.1.b2.notExist.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a2.0.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a2.c.notExists"))
+      assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a2.notExist.notExists"))
+    })
+  })
   it("$root", function() {
     let value = treeNode.value
     assert.equal(treeNode.value.$root, value)
@@ -212,7 +427,7 @@ describe("ReactifyObjectTreeNode", function() {
     })
     describe("functionality", function() {
       it("object.$roTree does not have a child property name `name`, throw TypeError", function() {
-        assert.throws(() => treeNode2.register(treeNode.children.a.value, "notExistsPropertyName"))
+        assert.throws(() => treeNode2.register(treeNode.children.a.value, "notExistPropertyName"))
       })
 
       it("after register, this.update will be called after the target property is set to a new value", function() {
@@ -394,6 +609,11 @@ describe("ReactifyObjectTreeNode", function() {
       assert.equal(object.a2, "new a2")
       assert.equal(treeNode.children.a2.value, "new a2")
     })
+
+    it("set property's value in async mode, will return Promise", function() {
+      let res = asyncTreeNode.set("a2", "new a2")
+      assert.equal(Promise.resolve(res), res)
+    })
   })
 
   describe("toObject", function() {
@@ -410,6 +630,79 @@ describe("ReactifyObjectTreeNode", function() {
       assert.deepEqual(treeNode.children.a2.toObject(), { b2: "b2", c2: "c2" })
       assert.deepEqual(treeNode.children.a2.children.b2.toObject(), "b2")
       assert.deepEqual(treeNode.children.a2.children.c2.toObject(), "c2")
+    })
+  })
+
+  describe("setSequence", function() {
+    it("sync, pass non-array value for an array property, should throw TypeError", function() {
+      assert.throws(() => {
+        for (let seq of arrayTreeNode.setSequence({ a: "not array" }));
+      }, TypeError)
+    })
+
+    it("sync, pass non-object value for an object property, should throw TypeError", function() {
+      assert.throws(() => {
+        for (let seq of treeNode.setSequence({ a: "not object" }));
+      })
+    })
+
+    it("sync, functionality, change leaf's value through object", function() {
+      for (let seq of treeNode.setSequence({ a: { b: "new b" }, a2: { c2: "new c2" } }));
+      assert.equal(object.a.b, "new b")
+      assert.equal(object.a.c, "c", "no change")
+      assert.equal(object.a2.c2, "new c2")
+      assert.equal(object.a2.b2, "b2")
+    })
+
+    it("sync, functionality, change leaf's value through object, yet property does not exist", function() {
+      assert.throws(() => {
+        for (let seq of treeNode.setSequence({ a: { notexists: "new b" }, a2: { c2: "new c2" } }));
+      }, ReferenceError)
+    })
+
+    it("sync, functionality, change leaf's value through array", function() {
+      for (let seq of arrayTreeNode.setSequence({ a: { 0: { b: { c2: "new c" } }, 1: { b2: "new b2" } } }));
+      assert.equal(arrayObject.a[0].b.c2, "new c")
+      assert.equal(arrayObject.a[1].b2, "new b2")
+    })
+
+    it("sync, functionality, change leaf's value through array yet index is invalid", function() {
+      assert.throws(() => {
+        for (let seq of arrayTreeNode.setSequence({ a: { 0.3: { b: { c2: "new c" } } } }));
+      }, TypeError)
+      assert.throws(() => {
+        for (let seq of arrayTreeNode.setSequence({ a: { "4": { b: { c2: "new c" } } } }));
+      }, RangeError)
+    })
+
+    it("sync, functionality, manipulates element of an array", function() {
+      let old = arrayTreeNode.children.a.value[0].$roTree.value
+      for (let seq of arrayTreeNode.setSequence({
+        a: [0, 1, { b: { c: {}, c2: "new c2" }, b2: "new b2" }, { b: { c: {}, c2: "new c2" }, b2: "new b2" }]
+      })) {
+        let result = seq
+        assert.equal(result.length, 1)
+        assert.equal(result[0], old)
+      }
+      assert.equal(arrayObject.a.length, 3)
+      assert.equal(arrayObject.a[0].b.c2, "new c2")
+      assert.equal(arrayObject.a[0].b2, "new b2")
+      assert.equal(arrayObject.a[1].b.c2, "new c2")
+      assert.equal(arrayObject.a[1].b2, "new b2")
+    })
+
+    it("async, functionality, change leaf's value through object", async function() {
+      for (let seq of asyncTreeNode.setSequence({ a: { 0: { b2: "new b" } }, a2: { c2: "new c2" } })) {
+        assert.equal(Promise.resolve(seq), seq)
+        await seq
+      }
+      let a = await asyncObject.a
+      let a0 = await a[0]
+      let b2 = await a0.b2
+      let a2 = await asyncObject.a2
+      let c2 = await a2.c2
+      assert.equal(b2, "new b")
+      assert.equal(c2, "new c2")
     })
   })
 

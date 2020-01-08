@@ -1,6 +1,6 @@
 const _ = require("lodash")
 const assert = require("assert")
-const setupValue = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/setupValue/setupValue")
+const setupValue = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupValue")
 const deferRequire = require("defer-require")
 const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 const ArrayValueClass = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")

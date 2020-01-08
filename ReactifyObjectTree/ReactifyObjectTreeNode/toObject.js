@@ -11,8 +11,7 @@ function toObject(object, clone) {
     object[this.name] = clone ? this.clone(this.value) : this.value
     return
   }
-  let value = this.value
-  if (value instanceof ArrayValueClass) {
+  if (this.isArrayNode) {
     let arr = (object[this.name] = [])
     for (let i = 0; i < this.itemSymbols.length; i++) toObject.call(this.children[this.itemSymbols[i]], arr, clone)
   } else {

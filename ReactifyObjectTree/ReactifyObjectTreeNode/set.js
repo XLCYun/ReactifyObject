@@ -54,7 +54,8 @@ function set(object, index, newValue, mode) {
     mode = newValue
     newValue = index
   }
-  if (mode !== "sync" && mode !== "async") throw Error("mode has to be 'async' or 'sync'")
+  if (mode !== undefined && mode !== "sync" && mode !== "async") throw Error("mode has to be 'async' or 'sync'")
+  mode = mode || treeNode.mode
 
   if (treeNode.validator(newValue) === false) throw TypeError("Cannot set new value: Validation failed")
   if (treeNode.compare(treeNode.value, newValue)) return
