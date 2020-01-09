@@ -11,6 +11,7 @@ const mode = require("./mode")
 const init = require("./init")
 const properties = require("./properties")
 const items = require("./items")
+const Default = require("./default")
 
 module.exports = {
   type,
@@ -25,5 +26,6 @@ module.exports = {
   mode,
   init,
   properties,
-  items
+  items,
+  default: Default
 }

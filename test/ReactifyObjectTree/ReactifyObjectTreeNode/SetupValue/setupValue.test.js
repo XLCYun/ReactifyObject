@@ -85,7 +85,7 @@ describe("setupValue", function() {
     let config = { a: { properties: {} }, b: {} }
     let treeNode = new ReactifyObjectTreeNode.module(object, config, "", null)
     delete treeNode.children.a.value
-    setupValue(treeNode)
+    setupValue.call(treeNode)
     assert.equal(treeNode.children.a.value, undefined)
   })
 

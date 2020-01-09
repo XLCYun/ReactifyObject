@@ -68,7 +68,7 @@ describe("set.js", function() {
     it("validator rejects new value, throw TypeError", function() {
       let config = {
         a: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } },
-        a2: { bsonType: "string" }
+        a2: { bsonType: "string", default: "" }
       }
       let object = {}
       treeNode = new ReactifyObjectTreeNode.module(object, config, "", null)
