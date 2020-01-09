@@ -12,5 +12,6 @@ ReactifyObject.inject = function(object, config, name, parent) {
 ReactifyObject.entry = entry
 ReactifyObject.validator = validator
 ReactifyObject.compare = compare
+ReactifyObject.Tree = ReactifyObjectTreeNode
 
 module.exports = ReactifyObject
