@@ -2,6 +2,7 @@ const defer_require = require("defer-require")
 const _ = require("lodash")
 const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 const ArrayValueClass = require("../ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
+const noValueSymbol = require("../ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 
 function preprocess() {}
 
@@ -17,11 +18,16 @@ function process(treeNode) {
 
   if (treeNode.isLeaf === false && treeNode.config.items) {
     treeNode.itemSymbols = []
-    if (_.isArray(treeNode.object))
-      for (let item of treeNode.object) {
-        let res = ArrayValueClass.addChild(treeNode, item)
-        treeNode.itemSymbols.push(res.symbol)
-      }
+    let arrays = [treeNode.copyFrom, treeNode.object, []]
+    let index = _.isArray(treeNode.copyFrom) ? 0 : _.isArray(treeNode.object) ? 1 : 2
+    for (let item of arrays[index]) {
+      let res = ArrayValueClass.addChild(
+        treeNode,
+        index === 1 ? item : noValueSymbol, // object
+        index === 0 ? item : noValueSymbol // copyFrom
+      )
+      treeNode.itemSymbols.push(res.symbol)
+    }
   }
 }
 

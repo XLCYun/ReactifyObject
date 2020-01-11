@@ -83,7 +83,7 @@ class revision {
             index = index[index.length - 1]
             if (parent.value.length.toString() !== index)
               throw Error(`Apply patch failed: Push ${item.path} whose index should be ${parent.value.length}.`)
-            let addChild = ArrayValueClass.addChild(parent, item.value)
+            let addChild = ArrayValueClass.addChild(parent, item.value, item.value)
             parent.itemSymbols.push(addChild.symbol)
             parent.value.updateLength()
           } else modify(node, item.value)

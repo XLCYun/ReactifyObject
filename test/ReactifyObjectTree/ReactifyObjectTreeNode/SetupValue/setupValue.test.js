@@ -2,9 +2,11 @@ const _ = require("lodash")
 const assert = require("assert")
 const setupValue = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupValue")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = deferRequire(
+  "../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
+)
 const ArrayValueClass = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ArrayValueClass/ArrayValueClass")
-
+const noValueSymbol = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 describe("setupValue", function() {
   let config = {
     a: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } },
@@ -125,6 +127,44 @@ describe("setupValue", function() {
       delete a.value
       setupValue.call(a)
       assert.ok(a.value, ArrayValueClass)
+    })
+  })
+
+  describe("choose value", function() {
+    let config = {
+      valueFromCopyFrom: {},
+      valueFromObject: {},
+      valueFromDefault: { default: "default value" },
+      valueIsUndefined: {}
+    }
+    let object = { valueFromObject: "object value" }
+    let copyFrom = { valueFromCopyFrom: "copyFrom value" }
+    let treeNode = new ReactifyObjectTreeNode.module(object, config, "root", null, copyFrom)
+    it("copyFrom -> object -> default -> undefined", function() {
+      assert.equal(object.valueFromCopyFrom, "copyFrom value")
+      assert.equal(object.valueFromObject, "object value")
+      assert.equal(object.valueFromDefault, "default value")
+      assert.equal(object.valueIsUndefined, undefined)
+
+      assert.equal(treeNode.children.valueFromCopyFrom.value, "copyFrom value")
+      assert.equal(treeNode.children.valueFromCopyFrom.copyFrom, "copyFrom value")
+      assert.equal(treeNode.children.valueFromCopyFrom.object, noValueSymbol)
+      assert.equal(treeNode.children.valueFromCopyFrom.default, undefined)
+
+      assert.equal(treeNode.children.valueFromObject.value, "object value")
+      assert.equal(treeNode.children.valueFromObject.object, "object value")
+      assert.equal(treeNode.children.valueFromObject.copyFrom, noValueSymbol)
+      assert.equal(treeNode.children.valueFromObject.default, undefined)
+
+      assert.equal(treeNode.children.valueFromDefault.value, "default value")
+      assert.equal(treeNode.children.valueFromDefault.object, noValueSymbol)
+      assert.equal(treeNode.children.valueFromDefault.copyFrom, noValueSymbol)
+      assert.equal(treeNode.children.valueFromDefault.default, "default value")
+
+      assert.equal(treeNode.children.valueIsUndefined.value, undefined)
+      assert.equal(treeNode.children.valueIsUndefined.default, undefined)
+      assert.equal(treeNode.children.valueIsUndefined.object, noValueSymbol)
+      assert.equal(treeNode.children.valueIsUndefined.copyFrom, noValueSymbol)
     })
   })
 })

@@ -4,6 +4,8 @@ const entry = require("../ReactifyObjectTree/entries/entry")
 const compare = require("../compare/compare")
 const validator = require("../validator/validator")
 const ReactifyObjectTreeNode = require("../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const noValueSymbol = require("../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
+
 describe("ReactifyObject", function() {
   it("entry refers to entry module", function() {
     assert.equal(entry, ReactifyObject.entry)
@@ -27,5 +29,9 @@ describe("ReactifyObject", function() {
     assert.ok(treeNode instanceof ReactifyObjectTreeNode)
     assert.equal(object.a, treeNode.children.a.value)
     assert.equal(object.a2, treeNode.children.a2.value)
+  })
+
+  it("expose noValueSymbol", function() {
+    assert.equal(noValueSymbol, ReactifyObject.noValueSymbol)
   })
 })

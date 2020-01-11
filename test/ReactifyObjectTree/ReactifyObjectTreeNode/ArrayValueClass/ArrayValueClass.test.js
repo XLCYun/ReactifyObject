@@ -508,7 +508,7 @@ describe("ArrayValueClass", function() {
       for (let i = 0; i < 10; i++) {
         let treeNode = object.a.$roTree
         let old = Object.getOwnPropertySymbols(treeNode.children).length
-        let child = ArrayValueClass.addChild(treeNode, i)
+        let child = ArrayValueClass.addChild(treeNode, i, i)
         assert.equal(treeNode.children[child.symbol], child)
         let newLen = Object.getOwnPropertySymbols(treeNode.children).length
         assert.equal(old + 1, newLen)
@@ -517,38 +517,38 @@ describe("ArrayValueClass", function() {
 
     describe("child's name will be defined as getter/setter", function() {
       it("add child, but symbol has not push into itemSymbols, name return -1", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         assert.equal(item.name, -1)
         a.itemSymbols.push(item.symbol)
         assert.equal(item.name, 2)
       })
       it("add child, symbol has push into itemSymbols, name return 2", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         a.itemSymbols.push(item.symbol)
         assert.equal(item.name, 2)
       })
       it("child is remove from parent, become dangling array item, return string as name", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         item.parent = null
         assert.equal(item.name, "DanglingArrayItem" + item.id)
       })
       it("parent does not have itemSymbols, become dangling array item, return string as name", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         item.parent.itemSymbols = null
         assert.equal(item.name, "DanglingArrayItem" + item.id)
       })
       it("Not dangling array item cannot set its name", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         assert.throws(() => (item.name = 1))
       })
       it("dangling without parent, set a new name can delete its getter/setter therefore permanently change its name", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         item.parent = null
         item.name = "new name"
         assert.equal(item.name, "new name")
       })
       it("dangling without parent.itemSymbols, set a new name can delete its getter/setter therefore permanently change its name", function() {
-        let item = ArrayValueClass.addChild(a, 1)
+        let item = ArrayValueClass.addChild(a, 1, 1)
         item.parent.itemSymbols = null
         item.name = "new name"
         assert.equal(item.name, "new name")

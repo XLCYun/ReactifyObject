@@ -12,10 +12,12 @@ const ArrayValueClass = require("./ArrayValueClass/ArrayValueClass")
 const getTreeNodeByPath = require("./getTreeNodeByPath")
 const revision = require("../revision/revision")
 
+// copyFrom -> object -> default -> undefined
 class ReactifyObjectTreeNode extends TreeNode {
-  constructor(object, config, name, parent) {
+  constructor(object, config, name, parent, copyFrom) {
     super(config, name, parent)
     this.object = object
+    this.copyFrom = copyFrom
 
     this.event = new EventMan()
     // prepocess/process config

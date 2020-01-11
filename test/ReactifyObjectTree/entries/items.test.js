@@ -5,6 +5,7 @@ const deferRequire = require("defer-require")
 const ReactifyObjectTreeNode = deferRequire(
   "../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode.js"
 )
+const noValueSymbol = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 
 describe("items", function() {
   let config = undefined
@@ -74,6 +75,72 @@ describe("items", function() {
           assert.equal(itemTreeNode.value.b2, "test items: b2")
           assert.equal(itemTreeNode.value.b.c2, "test items: c2")
         }
+      })
+
+      it("setup items from copyFrom, if it's given", function() {
+        object = {
+          a: [
+            { b: { c: {}, c2: "I am c2" }, b2: "I am b2" },
+            { b: { c: {}, c2: "I am c22" }, b2: "I am b22" }
+          ],
+          a2: "I am a2"
+        }
+        let copyFrom = {
+          a: [
+            { b: { c: {}, c2: "I am c2 from copyFrom" }, b2: "I am b2 from copyFrom" },
+            { b: { c: {}, c2: "I am c22 from copyFrom" }, b2: "I am b22 from copyFrom" }
+          ],
+          a2: "I am a2 from copyFrom"
+        }
+        treeNode = new ReactifyObjectTreeNode.module(object, config, "", null, copyFrom)
+        assert.equal(object.a[0].b.c2, "I am c2 from copyFrom")
+        assert.equal(object.a[0].b2, "I am b2 from copyFrom")
+        assert.equal(object.a[1].b.c2, "I am c22 from copyFrom")
+        assert.equal(object.a[1].b2, "I am b22 from copyFrom")
+      })
+
+      it("setup items from copyFrom and object", function() {
+        config = {
+          a: { items: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } } },
+          a2: { items: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } } }
+        }
+        object = {
+          a: [
+            { b: { c: {}, c2: "I am c2" }, b2: "I am b2" },
+            { b: { c: {}, c2: "I am c22" }, b2: "I am b22" }
+          ]
+        }
+        let copyFrom = {
+          a2: [
+            { b: { c: {}, c2: "I am c2 from copyFrom" }, b2: "I am b2 from copyFrom" },
+            { b: { c: {}, c2: "I am c22 from copyFrom" }, b2: "I am b22 from copyFrom" }
+          ]
+        }
+        treeNode = new ReactifyObjectTreeNode.module(object, config, "", null, copyFrom)
+        assert.equal(object.a[0].b.c2, "I am c2")
+        assert.equal(object.a[0].b2, "I am b2")
+        assert.equal(object.a[1].b.c2, "I am c22")
+        assert.equal(object.a[1].b2, "I am b22")
+        assert.equal(object.a[0].b.$roTree.children.c2.object, "I am c2")
+        assert.equal(object.a[0].$roTree.children.b2.object, "I am b2")
+        assert.equal(object.a[1].b.$roTree.children.c2.object, "I am c22")
+        assert.equal(object.a[1].$roTree.children.b2.object, "I am b22")
+        assert.equal(object.a[0].b.$roTree.children.c2.copyFrom, noValueSymbol)
+        assert.equal(object.a[0].$roTree.children.b2.copyFrom, noValueSymbol)
+        assert.equal(object.a[1].b.$roTree.children.c2.copyFrom, noValueSymbol)
+        assert.equal(object.a[1].$roTree.children.b2.copyFrom, noValueSymbol)
+        assert.equal(object.a2[0].b.c2, "I am c2 from copyFrom")
+        assert.equal(object.a2[0].b2, "I am b2 from copyFrom")
+        assert.equal(object.a2[1].b.c2, "I am c22 from copyFrom")
+        assert.equal(object.a2[1].b2, "I am b22 from copyFrom")
+        assert.equal(object.a2[0].b.$roTree.children.c2.copyFrom, "I am c2 from copyFrom")
+        assert.equal(object.a2[0].$roTree.children.b2.copyFrom, "I am b2 from copyFrom")
+        assert.equal(object.a2[1].b.$roTree.children.c2.copyFrom, "I am c22 from copyFrom")
+        assert.equal(object.a2[1].$roTree.children.b2.copyFrom, "I am b22 from copyFrom")
+        assert.equal(object.a2[0].b.$roTree.children.c2.object, noValueSymbol)
+        assert.equal(object.a2[0].$roTree.children.b2.object, noValueSymbol)
+        assert.equal(object.a2[1].b.$roTree.children.c2.object, noValueSymbol)
+        assert.equal(object.a2[1].$roTree.children.b2.object, noValueSymbol)
       })
     })
   })

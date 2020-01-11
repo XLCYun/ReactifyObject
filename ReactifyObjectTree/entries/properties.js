@@ -1,5 +1,6 @@
 const defer_require = require("defer-require")
 const ReactifyObjectTreeNode = defer_require("../ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const noValueSymbol = require("../ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 
 function preprocess(treeNode) {
   if (treeNode instanceof ReactifyObjectTreeNode.module === false)
@@ -30,10 +31,17 @@ function process(treeNode) {
     let properties = Object.keys(treeNode.config.properties)
     for (let prop of properties)
       treeNode.children[prop] = new ReactifyObjectTreeNode.module(
-        typeof treeNode.object === "object" && treeNode.object !== null ? treeNode.object[prop] : undefined,
+        typeof treeNode.object === "object" && treeNode.object !== null && Object.keys(treeNode.object).includes(prop)
+          ? treeNode.object[prop]
+          : noValueSymbol,
         treeNode.config.properties[prop],
         prop,
-        treeNode
+        treeNode,
+        typeof treeNode.copyFrom === "object" &&
+        treeNode.copyFrom !== null &&
+        Object.keys(treeNode.copyFrom).includes(prop)
+          ? treeNode.copyFrom[prop]
+          : noValueSymbol
       )
   }
 }

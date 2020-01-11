@@ -5,6 +5,7 @@ const ReactifyObjectTreeNode = require("../../../ReactifyObjectTree/ReactifyObje
 const MixType = require("../../helper/mixType")
 const entry = require("../../../ReactifyObjectTree/entries/entry")
 const revision = require("../../../ReactifyObjectTree/revision/revision")
+const noValueSymbol = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 
 describe("ReactifyObjectTreeNode", function() {
   let config = {
@@ -91,6 +92,30 @@ describe("ReactifyObjectTreeNode", function() {
       })
     })
     describe("functionality", function() {
+      it("test object", function() {
+        assert.equal(treeNode.object, object)
+      })
+
+      it("test noValueSymbol for object and copyFrom", function() {
+        let copyFrom = {}
+        let object = {}
+        treeNode = new ReactifyObjectTreeNode(object, config, "", null, copyFrom)
+        assert.equal(treeNode.copyFrom, copyFrom)
+        assert.equal(treeNode.children.a.copyFrom, noValueSymbol)
+        assert.equal(treeNode.children.a.children.b.copyFrom, noValueSymbol)
+        assert.equal(treeNode.children.a.children.c.copyFrom, noValueSymbol)
+        assert.equal(treeNode.children.a2.copyFrom, noValueSymbol)
+        assert.equal(treeNode.children.a2.children.b2.copyFrom, noValueSymbol)
+        assert.equal(treeNode.children.a2.children.c2.copyFrom, noValueSymbol)
+        assert.equal(treeNode.object, object)
+        assert.equal(treeNode.children.a.object, noValueSymbol)
+        assert.equal(treeNode.children.a.children.b.object, noValueSymbol)
+        assert.equal(treeNode.children.a.children.c.object, noValueSymbol)
+        assert.equal(treeNode.children.a2.object, noValueSymbol)
+        assert.equal(treeNode.children.a2.children.b2.object, noValueSymbol)
+        assert.equal(treeNode.children.a2.children.c2.object, noValueSymbol)
+      })
+
       it("test event", function() {
         assert.ok(treeNode.event instanceof EventMan)
         assert.ok(treeNode.children.a.event instanceof EventMan)

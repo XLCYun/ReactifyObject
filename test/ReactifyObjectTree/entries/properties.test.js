@@ -5,7 +5,7 @@ const ReactifyObjectTreeNode = defer_require(
   "../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
 )
 const mixType = require("../../helper/mixType")
-
+const noValueSymbol = require("../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
 const properties = require("../../../ReactifyObjectTree/entries/properties")
 
 describe("properties", function() {
@@ -142,7 +142,7 @@ describe("properties", function() {
       assert.equal(treeNode.children.a.children.a2.object, treeNode.object.a.a2)
       assert.equal(treeNode.children.b.children.b1.object, treeNode.object.b.b1)
       assert.equal(treeNode.children.b.children.b2.object, treeNode.object.b.b2)
-      assert.equal(treeNode.children.c.object, undefined)
+      assert.equal(treeNode.children.c.object, noValueSymbol)
 
       // config
       assert.equal(treeNode.children.a.config, treeNode.config.properties.a)
@@ -161,6 +161,16 @@ describe("properties", function() {
       assert.equal(treeNode.children.a.children.a2.parent, treeNode.children.a)
       assert.equal(treeNode.children.b.children.b1.parent, treeNode.children.b)
       assert.equal(treeNode.children.b.children.b2.parent, treeNode.children.b)
+    })
+
+    it("object.a === undefined, still will set to undefined", function() {
+      let treeNode = new ReactifyObjectTreeNode.module({ a: undefined }, { a: {} }, "root", null)
+      assert.equal(treeNode.children.a.value, undefined)
+    })
+
+    it("copyFrom.a === undefined, still will set to undefined", function() {
+      let treeNode = new ReactifyObjectTreeNode.module({ a: "object a" }, { a: {} }, "root", null, { a: undefined })
+      assert.equal(treeNode.children.a.value, undefined)
     })
   })
 })

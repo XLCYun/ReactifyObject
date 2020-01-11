@@ -1,5 +1,6 @@
 const deferRequire = require("defer-require")
 const _ = require("lodash")
+const noValueSymbol = require("../SetupValue/noValueSymbol")
 
 const ReactifyObjectTreeNode = deferRequire("../ReactifyObjectTreeNode.js")
 
@@ -16,9 +17,9 @@ class ArrayValueClass extends Array {
   constructor(treeNode) {
     if (treeNode instanceof ReactifyObjectTreeNode.module === false)
       throw TypeError("ArrayValueClass receives and only receives a instance of ReactifyObjectTreeNode")
-    let msg = "Cannot find item's symbol array in ReactifyObjectTreeNode, are you sure it's a TreeNode for array?"
     super()
 
+    let msg = "Cannot find item's symbol array in ReactifyObjectTreeNode, are you sure it's a TreeNode for array?"
     if (_.isArray(treeNode.itemSymbols) === false) throw TypeError(msg)
 
     // $roTree/$set/$root
@@ -90,7 +91,7 @@ class ArrayValueClass extends Array {
    * @param  {...any} addItems items to add
    */
   unshift(...addItems) {
-    addItems = addItems.map(e => ArrayValueClass.addChild(this.$roTree, e)).map(e => e.symbol)
+    addItems = addItems.map(e => ArrayValueClass.addChild(this.$roTree, e, e)).map(e => e.symbol)
     this.$roTree.itemSymbols.unshift(...addItems)
     this.updateLength()
     return this.emit(this.length, "unshift")
@@ -104,7 +105,7 @@ class ArrayValueClass extends Array {
    * @return {Array} return removed items in a array
    */
   splice(start, deleteCount, ...pushItems) {
-    pushItems = pushItems.map(e => ArrayValueClass.addChild(this.$roTree, e)).map(e => e.symbol)
+    pushItems = pushItems.map(e => ArrayValueClass.addChild(this.$roTree, e, e)).map(e => e.symbol)
     let deleteItems = this.$roTree.itemSymbols.splice(start, deleteCount, ...pushItems)
     let res = []
     deleteItems.forEach(e => {
@@ -120,7 +121,7 @@ class ArrayValueClass extends Array {
    * @param {Any} value value to push
    */
   push(value) {
-    let res = ArrayValueClass.addChild(this.$roTree, value)
+    let res = ArrayValueClass.addChild(this.$roTree, value, value)
     this.$roTree.itemSymbols.push(res.symbol)
     this.updateLength()
     return this.emit(this.length, "push")
@@ -154,7 +155,7 @@ class ArrayValueClass extends Array {
    * @param {*} end End index, default arr.length.
    */
   fill(value, start, end) {
-    let treeNode = ArrayValueClass.addChild(this.$roTree, value)
+    let treeNode = ArrayValueClass.addChild(this.$roTree, value, value)
     this.$roTree.itemSymbols.fill(treeNode.symbol, start, end)
     this.update()
     return this.emit(this, "fill")
@@ -204,15 +205,16 @@ class ArrayValueClass extends Array {
   /**
    * Add a child into the tree node
    * @param {*} treeNode tree node to add child
-   * @param {*} value value to generate a child tree node
+   * @param {*} object object for child
+   * @param {*} copyFrom copyFrom for child
    */
-  static addChild(treeNode, value) {
+  static addChild(treeNode, object, copyFrom) {
     if (treeNode instanceof ReactifyObjectTreeNode.module === false)
       throw TypeError("treeNode should be instance of ReactifyObjectTreeNode")
     if (!treeNode.config.items)
       throw Error("Cannot find `items` config in treeNode, are you sure it's a array tree node?")
     let symbol = Symbol()
-    let itemTreeNode = new ReactifyObjectTreeNode.module(value, treeNode.config.items, "[]", treeNode)
+    let itemTreeNode = new ReactifyObjectTreeNode.module(object, treeNode.config.items, "[]", treeNode, copyFrom)
 
     itemTreeNode.symbol = symbol
     treeNode.children[symbol] = itemTreeNode

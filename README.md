@@ -63,3 +63,34 @@ Output:
 ```
 Origin
 ```
+
+value:
+
+- Find from `copyFrom`
+- Find from `object`
+- Find from `default`
+- undefined
+
+First time to setup the tree, `$roTree.copyFrom` will be the value from the argument `copyFrom` that passed to the `inject` function.
+
+```js
+let object = { a: "value from object", b: 2 }
+let copyFrom = { a: "value from copyFrom" }
+let $roTree = ReactifyObject.inject(object, { a: {}, b: {} }, "root", null, copyFrom)
+$roTree.children.a.copyFrom === "value from copyFrom" // true
+$roTree.children.a.object === "value from object" // true
+$roTree.children.b.object === 2 // true
+$roTree.children.b.copyFrom === ReactifyObject.noValueSymbol // true
+```
+
+When you add a item to an array(through `splice`/`push`/`shift`), it's `ReactifyObjectTreeNode`'s copyFrom and object will be the same one, that is, the item:
+
+```js
+let object = { a: [0, 1, 2] }
+let $roTree = ReactifyObject.inject(object, { a: { items: {} } }, "root", null)
+object.a.push(3)
+object.a.getTreeNodeByIndex(3).object === 3 // true
+object.a.getTreeNodeByIndex(3).copyFrom === 3 // true
+```
+
+

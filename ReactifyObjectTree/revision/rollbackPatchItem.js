@@ -50,7 +50,6 @@ function generatePatchItem(patchArray, base, treeNode) {
     let baseLength = base.length
     let min = Math.min(currentLength, baseLength)
     let max = Math.max(currentLength, baseLength)
-    let maxArray = baseLength > currentLength ? base : current
     let operation = baseLength > currentLength ? op.enum.ADD : op.enum.REMOVE
     for (let i = 0; i < min; i++) generatePatchItem(patchArray, base[i], current.getTreeNodeByIndex(i))
     if (operation === op.enum.ADD) {
