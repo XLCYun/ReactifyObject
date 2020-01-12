@@ -3,6 +3,7 @@ const validator = require("./validator/validator")
 const compare = require("./compare/compare")
 const entry = require("./ReactifyObjectTree/entries/entry")
 const noValueSymbol = require("./ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol")
+const clone = require("./clone/clone")
 class ReactifyObject {}
 
 ReactifyObject.inject = function(object, config, name, parent, copyFrom) {
@@ -14,5 +15,6 @@ ReactifyObject.validator = validator
 ReactifyObject.compare = compare
 ReactifyObject.Tree = ReactifyObjectTreeNode
 ReactifyObject.noValueSymbol = noValueSymbol
+ReactifyObject.clone = clone
 
 module.exports = ReactifyObject
