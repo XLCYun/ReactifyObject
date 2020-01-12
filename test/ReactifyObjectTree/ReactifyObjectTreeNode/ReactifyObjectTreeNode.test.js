@@ -428,6 +428,7 @@ describe("ReactifyObjectTreeNode", function() {
       assert.equal(undefined, arrayTreeNode.getParentTreeNodeByPath("$root.a2.notExist.notExists"))
     })
   })
+
   it("$root", function() {
     let value = treeNode.value
     assert.equal(treeNode.value.$root, value)
@@ -441,6 +442,21 @@ describe("ReactifyObjectTreeNode", function() {
     assert.equal(object.a2.$root, value)
     assert.equal(treeNode.children.a2.children.b2.$root, value)
     assert.equal(treeNode.children.a2.children.c2.$root, value)
+  })
+
+  it("$object", function() {
+    let value = treeNode.value
+    assert.equal(treeNode.$object, object)
+    assert.equal(object.$object, object)
+    assert.equal(treeNode.children.a.$object, object)
+    assert.equal(object.a.$object, object)
+    assert.equal(treeNode.children.a.children.b.$object, object)
+    assert.equal(treeNode.children.a.children.c.$object, object)
+
+    assert.equal(treeNode.children.a2.$object, object)
+    assert.equal(object.a2.$object, object)
+    assert.equal(treeNode.children.a2.children.b2.$object, object)
+    assert.equal(treeNode.children.a2.children.c2.$object, object)
   })
 
   describe("register", function() {

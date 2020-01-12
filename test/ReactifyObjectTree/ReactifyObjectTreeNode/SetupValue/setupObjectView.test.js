@@ -2,7 +2,9 @@ const _ = require("lodash")
 const assert = require("assert")
 const setupObjectView = require("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/setupObjectView")
 const deferRequire = require("defer-require")
-const ReactifyObjectTreeNode = deferRequire("../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+const ReactifyObjectTreeNode = deferRequire(
+  "../../../../ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
+)
 const mixType = require("../../../helper/mixType")
 
 describe("setupObjectView", function() {
@@ -53,6 +55,18 @@ describe("setupObjectView", function() {
     delete treeNode.value.$root
     setupObjectView(setupObject, treeNode)
     assert.equal(setupObject.$root, treeNode.value)
+  })
+
+  it("$object", function() {
+    delete treeNode.value.$object
+    setupObjectView(setupObject, treeNode)
+    assert.equal(setupObject.$object, object)
+    setupObject = {}
+    setupObjectView(setupObject, treeNode.children.a)
+    setupObject = {}
+    setupObjectView(setupObject, treeNode.children.a2)
+    setupObject = {}
+    setupObjectView(setupObject, treeNode.children.a.children.b)
   })
 
   it("properties' getter", function() {

@@ -76,6 +76,13 @@ class ReactifyObjectTreeNode extends TreeNode {
   }
 
   /**
+   * get root's injected object
+   */
+  get $object() {
+    return this.root.object
+  }
+
+  /**
    * return true if this a array node
    */
   get isArrayNode() {
