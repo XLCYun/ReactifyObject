@@ -83,4 +83,35 @@ describe("processConfig", function() {
     treeNode.config.illegalConfigEntry = 3
     assert.throws(() => processConfig.call(treeNode), Error)
   })
+
+  describe("otherValidEntries will not throw Error", function() {
+    let config = {}
+    let object = {}
+    let treeNode = {}
+
+    beforeEach(function() {
+      config = {
+        a: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } },
+        a2: {}
+      }
+      treeNode = undefined
+      object = {}
+      treeNode = new ReactifyObjectTreeNode.module(object, config, "", null)
+    })
+
+    it("clone is valid key, will not throw Error", function() {
+      treeNode.config.properties.a.properties.b2.clone = e => e
+      assert.doesNotThrow(() => processConfig.call(treeNode))
+    })
+
+    it("validator is valid key, will not throw Error", function() {
+      treeNode.config.properties.a.properties.b2.validator = () => true
+      assert.doesNotThrow(() => processConfig.call(treeNode))
+    })
+
+    it("compare is valid key, will not throw Error", function() {
+      treeNode.config.properties.a.properties.b2.compare = () => true
+      assert.doesNotThrow(() => processConfig.call(treeNode))
+    })
+  })
 })
