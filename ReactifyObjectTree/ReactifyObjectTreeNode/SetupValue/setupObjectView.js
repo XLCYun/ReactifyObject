@@ -16,10 +16,12 @@ function setupObjectView(object, treeNode) {
   object.$roTree = treeNode
   object.$set = treeNode.set.bind(treeNode)
   Object.defineProperty(object, "$root", {
-    get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$root").get.bind(treeNode)
+    get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$root").get.bind(treeNode),
+    configurable: true
   })
   Object.defineProperty(object, "$object", {
-    get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$object").get.bind(treeNode)
+    get: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "$object").get.bind(treeNode),
+    configurable: true
   })
   // properties's getter and setter
   let keys = Object.keys(treeNode.children).map(e => treeNode.children[e].name)
@@ -30,7 +32,8 @@ function setupObjectView(object, treeNode) {
       ),
       set: Object.getOwnPropertyDescriptor(ReactifyObjectTreeNode.module.prototype, "setter").set.bind(
         treeNode.children[key]
-      )
+      ),
+      configurable: true
     })
   }
 }

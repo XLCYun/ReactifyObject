@@ -28,7 +28,8 @@ class ReactifyObjectTreeNode extends TreeNode {
     injectToObject.call(this)
     delete this.event.thisArg
     Object.defineProperty(this.event, "thisArg", {
-      get: () => (this.isRoot ? this.object : this.parent.value)
+      get: () => (this.isRoot ? this.object : this.parent.value),
+      configurable: true
     })
 
     // register 'init' event
