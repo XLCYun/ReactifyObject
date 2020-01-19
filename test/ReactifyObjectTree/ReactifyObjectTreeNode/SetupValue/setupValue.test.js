@@ -140,6 +140,7 @@ describe("setupValue", function() {
     let object = { valueFromObject: "object value" }
     let copyFrom = { valueFromCopyFrom: "copyFrom value" }
     let treeNode = new ReactifyObjectTreeNode.module(object, config, "root", null, copyFrom)
+
     it("copyFrom -> object -> default -> undefined", function() {
       assert.equal(object.valueFromCopyFrom, "copyFrom value")
       assert.equal(object.valueFromObject, "object value")
@@ -166,5 +167,14 @@ describe("setupValue", function() {
       assert.equal(treeNode.children.valueIsUndefined.object, noValueSymbol)
       assert.equal(treeNode.children.valueIsUndefined.copyFrom, noValueSymbol)
     })
+  })
+  it("default can be a function", function() {
+    let config = {
+      valueFromDefaultFunction: { default: () => "default value" }
+    }
+    let object = {}
+    let copyFrom = {}
+    let treeNode = new ReactifyObjectTreeNode.module(object, config, "root", null, copyFrom)
+    assert.equal(object.valueFromDefaultFunction, "default value")
   })
 })

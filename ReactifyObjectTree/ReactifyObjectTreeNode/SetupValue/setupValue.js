@@ -12,7 +12,13 @@ function setupValue() {
     } else if (this.config.items) setupArrayView(this)
   } else {
     let value =
-      this.copyFrom !== noValueSymbol ? this.copyFrom : this.object !== noValueSymbol ? this.object : this.default
+      this.copyFrom !== noValueSymbol
+        ? this.copyFrom
+        : this.object !== noValueSymbol
+        ? this.object
+        : typeof this.default === "function"
+        ? this.default()
+        : this.default
     if (this.validator(value) === false) throw TypeError(`${this.path} cannot initiated by ${value}`)
     this.value = this.clone(value)
   }
