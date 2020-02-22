@@ -126,7 +126,7 @@ class ReactifyObjectTreeNode extends TreeNode {
 
   /**
    * register the property's dependence on object[name]
-   * @param {Object} object targent's parent object
+   * @param {Object} object target's parent object
    * @param {String} index targent's name in its parent
    * @param {Boolean} deep if true, register the dependences to its children as well
    */
