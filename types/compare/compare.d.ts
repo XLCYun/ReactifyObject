@@ -1,5 +1,4 @@
 import { Comparator } from "./ExportedType"
-import exportedObject = require("../clone/clone")
 
 declare let functions: { [index: string]: Comparator }
 declare function getTypes(): string[]
@@ -15,4 +14,4 @@ declare let ExportedObject: {
   defineCompare: typeof defineCompare
 }
 
-export = exportedObject
+export = ExportedObject

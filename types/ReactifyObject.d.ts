@@ -1,10 +1,10 @@
-import Compare from "./compare/compare"
 import ReactifyObjectTreeNode from "./ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode"
 import NVS from "./ReactifyObjectTree/ReactifyObjectTreeNode/SetupValue/noValueSymbol"
-import Clone from "./clone/ExportedType"
+import Clone from "./clone/clone"
 import { ExtractTSType } from "./Config"
 import { EntryProcessorCollection } from "./ReactifyObjectTree/entries/ExportedType"
 import validate from "./validator/validator"
+import Compare from "./compare/compare"
 
 declare module "reactify-object" {
   class ReactifyObject {
