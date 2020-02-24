@@ -417,6 +417,48 @@ async function allAsyncFunc() {
   let aaValueItem0 = aaValueItem
   let rootTNode = allAsync.root
   rootTNode.children.a.value
-
   ;(await (await injected).a).getTreeNodeByIndex(4)
+}
+
+/** default 可以是一个函数 */
+type BJConfigType1 = Config<
+  "async",
+  "array",
+  Config<
+    "async",
+    "array",
+    Config<
+      "sync",
+      "array",
+      Config<"sync", "array", Config<"sync", "object", { TMP: Config<"async", "property", { string: string }> }>>
+    >
+  >
+>
+let BJConfig1: BJConfigType = {
+  mode: "async",
+  bsonType: "array",
+  default: () => {
+    return []
+  },
+  items: {
+    mode: "async",
+    default: () => [],
+    items: {
+      default: () => [[{ TMP: "" }]],
+      items: {
+        items: {
+          default: () => {
+            return { TMP: "" }
+          },
+          properties: {
+            TMP: {
+              mode: "async",
+              default: "4"
+            }
+          }
+        }
+      }
+    }
+  },
+  default: [[[[{ TMP: "4" }]]]]
 }

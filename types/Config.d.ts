@@ -1,18 +1,24 @@
 import { TreeNodeValueJSType, ValueView } from "./ReactifyObjectTree/ReactifyObjectTreeNode/ExportType"
 import ReactifyObjectTreeNode = require("./ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
+
 /** 工具类型：如果 Config 的 mode 类型是 "async"，用 Promise 包裹泛型参数 T */
 export type PromiseWrapper<Config, T> = ExtractConfigMode<Config> extends "async" ? Promise<T> : T
+export type AnyFunction<ArgumentArrayType extends any[] = any, ReturnType = any> = (
+  ...args: ArgumentArrayType
+) => ReturnType
 
-/** 异步的钩子函数 */
+/** 钩子函数 */
 export type AsyncHookFunction<ReturnType = any> = () => Promise<void | ReturnType>
-/** 同步的钩子函数 */
 export type SyncHookFunction<ReturnType = any> = () => void | ReturnType
+
 /** 条件类型：根据 mode 选择同/异步的钩子函数声明 */
 export type PickASyncHookFunction<Mode extends ConfigMode, ReturnType = any> = Mode extends "async"
   ? AsyncHookFunction<ReturnType>
   : SyncHookFunction<ReturnType>
+
 /** 同/异步模式 mode 的声明 */
 export type ConfigMode = "async" | "sync"
+
 /** 默认内置的 type 的可能取值以及对应的 TS 类型 */
 export interface TypeMapper<ObjectType = any, ArrayType = any> {
   object: ObjectType
@@ -22,6 +28,7 @@ export interface TypeMapper<ObjectType = any, ArrayType = any> {
   string: string
   null: null
 }
+
 /** 默认内置的 bsonType 的可能取值以及对应的 TS 类型 */
 export interface BsonTypeMapper<ObjectType = any, ArrayType = any> {
   double: number
@@ -88,7 +95,9 @@ interface ObjectConfigBase<Mode extends ConfigMode, ObjectProperitesConfig = any
 
   bsonType?: "object"
   type?: "object"
-  default?: { [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]> }
+  default?:
+    | { [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]> }
+    | AnyFunction<any, { [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]> }>
   init?: SyncHookFunction<void>
   properties: { [prop in keyof ObjectProperitesConfig]: ObjectProperitesConfig[prop] }
 }
@@ -119,7 +128,7 @@ export interface ArrayConfigBase<Mode extends ConfigMode, ArrayItemConfig = any>
 
   bsonType?: "array"
   type?: "array"
-  default?: ExtractTSType<ArrayItemConfig>[]
+  default?: ExtractTSType<ArrayItemConfig>[] | AnyFunction<any, ExtractTSType<ArrayItemConfig>[]>
   init?: SyncHookFunction<void>
   items: ArrayItemConfig
 }
@@ -147,7 +156,7 @@ export interface PropertyConfigBase<Mode extends ConfigMode, NameToTypeMapper = 
   bsonType?: keyof NameToTypeMapper | (keyof NameToTypeMapper)[]
   type?: keyof TypeMapper | keyof TypeMapper[]
 
-  default?: NameToTypeMapper[keyof NameToTypeMapper]
+  default?: NameToTypeMapper[keyof NameToTypeMapper] | AnyFunction<any, NameToTypeMapper[keyof NameToTypeMapper]>
   init?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
 }
 /** 异步的 Property 属性类型的基本配置结构声明 */
