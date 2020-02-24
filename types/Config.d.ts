@@ -157,6 +157,7 @@ export interface PropertyConfigBase<Mode extends ConfigMode, NameToTypeMapper = 
   type?: keyof TypeMapper | keyof TypeMapper[]
 
   default?: NameToTypeMapper[keyof NameToTypeMapper] | AnyFunction<any, NameToTypeMapper[keyof NameToTypeMapper]>
+  validator?: AnyFunction<[NameToTypeMapper[keyof NameToTypeMapper]], boolean>
   init?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
 }
 /** 异步的 Property 属性类型的基本配置结构声明 */

@@ -459,6 +459,38 @@ let BJConfig1: BJConfigType = {
         }
       }
     }
+  }
+}
+
+/** validator 指定一个自定义的判断是否合法的函数 */
+
+let BJConfig2: BJConfigType = {
+  mode: "async",
+  bsonType: "array",
+  default: () => {
+    return []
   },
-  default: [[[[{ TMP: "4" }]]]]
+  items: {
+    mode: "async",
+    default: () => [],
+    items: {
+      default: () => [[{ TMP: "" }]],
+      items: {
+        items: {
+          default: () => {
+            return { TMP: "" }
+          },
+          properties: {
+            TMP: {
+              mode: "async",
+              default: "4",
+              validator: e => {
+                return e === "5"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
