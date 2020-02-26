@@ -13,7 +13,7 @@ declare class revision<ROConfig, RevisionInfo = DefaultRevisionInfo> {
   baseSet: boolean
   tree: ReactifyObjectTreeNode<ROConfig>
   refreshBase(): void
-  getRollbackPath(): Patch<RevisionInfo>
+  getRollbackPatch(): Patch<RevisionInfo>
   applyPatch(patch: Patch<RevisionInfo>): void
 }
 
