@@ -52,10 +52,13 @@ export interface BsonTypeMapper<ObjectType = any, ArrayType = any> {
 type ObjectHookFunctionReturnType<ObjectProperitesConfig> = {
   [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
 }
-type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig> = PickASyncHookFunction<
+type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig, NumberOfArgs> = PickASyncHookFunction<
   Mode,
-  | [ObjectHookFunctionReturnType<ObjectProperitesConfig>]
-  | [ObjectHookFunctionReturnType<ObjectProperitesConfig>, ObjectHookFunctionReturnType<ObjectProperitesConfig>],
+  NumberOfArgs extends "1"
+    ? [ObjectHookFunctionReturnType<ObjectProperitesConfig>]
+    : NumberOfArgs extends "2"
+    ? [ObjectHookFunctionReturnType<ObjectProperitesConfig>, ObjectHookFunctionReturnType<ObjectProperitesConfig>]
+    : [],
   ObjectHookFunctionReturnType<ObjectProperitesConfig>
 >
 /** Object 类型的基本配置结构声明
@@ -63,13 +66,13 @@ type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig> = PickA
  */
 interface ObjectConfigBase<Mode extends ConfigMode, ObjectProperitesConfig = any> {
   /** Hooks */
-  afterGet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  afterSet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  afterUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  beforeGet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  beforeSet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  beforeUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig>
-  update?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  afterGet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "1">
+  afterSet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
+  afterUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
+  beforeGet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "1">
+  beforeSet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
+  beforeUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
+  update?: ObjectHookFunction<Mode, ObjectProperitesConfig, "0">
 
   bsonType?: "object"
   type?: "object"
@@ -91,9 +94,13 @@ export interface SyncObjectConfig<ObjectProperitesConfig = any>
 }
 
 /** -------------------------------- Array 类型  -------------------------------- */
-type ArrayHookFunction<Mode extends ConfigMode, ArrayItemConfig> = PickASyncHookFunction<
+type ArrayHookFunction<Mode extends ConfigMode, ArrayItemConfig, NumberOfArgs> = PickASyncHookFunction<
   Mode,
-  [ExtractTSType<ArrayItemConfig>[]] | [ExtractTSType<ArrayItemConfig>[], ExtractTSType<ArrayItemConfig>[]],
+  NumberOfArgs extends "1"
+    ? [ExtractTSType<ArrayItemConfig>[]]
+    : NumberOfArgs extends "2"
+    ? [ExtractTSType<ArrayItemConfig>[], ExtractTSType<ArrayItemConfig>[]]
+    : [],
   ExtractTSType<ArrayItemConfig>[]
 >
 /** Array 类型的基本配置结构声明
@@ -101,13 +108,13 @@ type ArrayHookFunction<Mode extends ConfigMode, ArrayItemConfig> = PickASyncHook
  */
 export interface ArrayConfigBase<Mode extends ConfigMode, ArrayItemConfig = any> {
   /** Hooks */
-  afterGet?: ArrayHookFunction<Mode, ArrayItemConfig>
-  afterSet?: ArrayHookFunction<Mode, ArrayItemConfig>
-  afterUpdate?: ArrayHookFunction<Mode, ArrayItemConfig>
-  beforeGet?: ArrayHookFunction<Mode, ArrayItemConfig>
-  beforeSet?: ArrayHookFunction<Mode, ArrayItemConfig>
-  beforeUpdate?: ArrayHookFunction<Mode, ArrayItemConfig>
-  update?: ArrayHookFunction<Mode, ArrayItemConfig>
+  afterGet?: ArrayHookFunction<Mode, ArrayItemConfig, "1">
+  afterSet?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
+  afterUpdate?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
+  beforeGet?: ArrayHookFunction<Mode, ArrayItemConfig, "1">
+  beforeSet?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
+  beforeUpdate?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
+  update?: ArrayHookFunction<Mode, ArrayItemConfig, "0">
 
   bsonType?: "array"
   type?: "array"
@@ -125,22 +132,25 @@ export interface SyncArrayConfig<ArrayItemConfig = any> extends ArrayConfigBase<
 }
 
 /** -------------------------------- Property 类型  -------------------------------- */
-type PropertyHookFunction<Mode extends ConfigMode, NameToTypeMapper> = PickASyncHookFunction<
+type PropertyHookFunction<Mode extends ConfigMode, NameToTypeMapper, NumberOfArgs> = PickASyncHookFunction<
   Mode,
-  | [NameToTypeMapper[keyof NameToTypeMapper]]
-  | [NameToTypeMapper[keyof NameToTypeMapper], NameToTypeMapper[keyof NameToTypeMapper]],
+  NumberOfArgs extends "1"
+    ? [NameToTypeMapper[keyof NameToTypeMapper]]
+    : NumberOfArgs extends "2"
+    ? [NameToTypeMapper[keyof NameToTypeMapper], NameToTypeMapper[keyof NameToTypeMapper]]
+    : [],
   NameToTypeMapper[keyof NameToTypeMapper]
 >
 /** Property 属性类型的基本配置结构声明 */
 export interface PropertyConfigBase<Mode extends ConfigMode, NameToTypeMapper = BsonTypeMapper> {
   /** Hooks */
-  afterGet?: PropertyHookFunction<Mode, NameToTypeMapper>
-  afterSet?: PropertyHookFunction<Mode, NameToTypeMapper>
-  afterUpdate?: PropertyHookFunction<Mode, NameToTypeMapper>
-  beforeGet?: PropertyHookFunction<Mode, NameToTypeMapper>
-  beforeSet?: PropertyHookFunction<Mode, NameToTypeMapper>
-  beforeUpdate?: PropertyHookFunction<Mode, NameToTypeMapper>
-  update?: PropertyHookFunction<Mode, NameToTypeMapper>
+  afterGet?: PropertyHookFunction<Mode, NameToTypeMapper, "1">
+  afterSet?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
+  afterUpdate?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
+  beforeGet?: PropertyHookFunction<Mode, NameToTypeMapper, "1">
+  beforeSet?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
+  beforeUpdate?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
+  update?: PropertyHookFunction<Mode, NameToTypeMapper, "0">
 
   bsonType?: keyof NameToTypeMapper | (keyof NameToTypeMapper)[]
   type?: keyof TypeMapper | keyof TypeMapper[]
