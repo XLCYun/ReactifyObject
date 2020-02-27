@@ -1,9 +1,9 @@
 import { PromiseWrapper, ExtractConfigValueType, ExtractTSType, ExtractTSTypePromise } from "../../../Config"
 import ReactifyObjectTreeNode = require("../ReactifyObjectTreeNode")
 import { ObjectValueView, ValueView } from "../ExportType"
-declare class ArrayValueClass<ROConfig> {
+declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   constructor(treeNode: typeof ReactifyObjectTreeNode)
-  [index: number]: ValueView<ExtractConfigValueType<ROConfig>>
+  [index: number]: ValueView<ExtractConfigValueType<ROConfig>, RootConfig, InjectedObjectType>
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
   $set(
@@ -22,15 +22,21 @@ declare class ArrayValueClass<ROConfig> {
   splice(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
   push(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
   copyWithin(): PromiseWrapper<ROConfig, void>
-  reverse(): ArrayValueClass<ROConfig>
-  fill(value: ExtractConfigValueType<ROConfig>, start: number, end: number): ArrayValueClass<ROConfig>
+  reverse(): ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>
+  fill(
+    value: ExtractConfigValueType<ROConfig>,
+    start: number,
+    end: number
+  ): ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>
   update(): PromiseWrapper<ROConfig, void>
   updateLength(): PromiseWrapper<ROConfig, void>
   updateChildren(): PromiseWrapper<ROConfig, void>
-  removeChild(symbol: symbol): PromiseWrapper<ROConfig, undefined | ArrayValueClass<ROConfig>>
+  removeChild(
+    symbol: symbol
+  ): PromiseWrapper<ROConfig, undefined | ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>>
   static addChild<ROConfig>(
     treeNode: ReactifyObjectTreeNode<ROConfig>,
-    object: ObjectValueView<ROConfig>,
+    object: ExtractTSType<ROConfig>,
     copyFrom?: ExtractTSType<ROConfig>
   )
   getTreeNodeByIndex(index: number): ReactifyObjectTreeNode<ExtractConfigValueType<ROConfig>>

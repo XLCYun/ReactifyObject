@@ -1,4 +1,4 @@
-import { TreeNodeValueJSType, ValueView } from "./ReactifyObjectTree/ReactifyObjectTreeNode/ExportType"
+import { TreeNodeValueJSType } from "./ReactifyObjectTree/ReactifyObjectTreeNode/ExportType"
 import ReactifyObjectTreeNode = require("./ReactifyObjectTree/ReactifyObjectTreeNode/ReactifyObjectTreeNode")
 
 /** 工具类型：如果 Config 的 mode 类型是 "async"，用 Promise 包裹泛型参数 T */
@@ -54,7 +54,8 @@ type ObjectHookFunctionReturnType<ObjectProperitesConfig> = {
 }
 type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig> = PickASyncHookFunction<
   Mode,
-  [ObjectHookFunctionReturnType<ObjectProperitesConfig>],
+  | [ObjectHookFunctionReturnType<ObjectProperitesConfig>]
+  | [ObjectHookFunctionReturnType<ObjectProperitesConfig>, ObjectHookFunctionReturnType<ObjectProperitesConfig>],
   ObjectHookFunctionReturnType<ObjectProperitesConfig>
 >
 /** Object 类型的基本配置结构声明
@@ -92,7 +93,7 @@ export interface SyncObjectConfig<ObjectProperitesConfig = any>
 /** -------------------------------- Array 类型  -------------------------------- */
 type ArrayHookFunction<Mode extends ConfigMode, ArrayItemConfig> = PickASyncHookFunction<
   Mode,
-  [ExtractTSType<ArrayItemConfig>[]],
+  [ExtractTSType<ArrayItemConfig>[]] | [ExtractTSType<ArrayItemConfig>[], ExtractTSType<ArrayItemConfig>[]],
   ExtractTSType<ArrayItemConfig>[]
 >
 /** Array 类型的基本配置结构声明
@@ -126,7 +127,8 @@ export interface SyncArrayConfig<ArrayItemConfig = any> extends ArrayConfigBase<
 /** -------------------------------- Property 类型  -------------------------------- */
 type PropertyHookFunction<Mode extends ConfigMode, NameToTypeMapper> = PickASyncHookFunction<
   Mode,
-  [NameToTypeMapper[keyof NameToTypeMapper]],
+  | [NameToTypeMapper[keyof NameToTypeMapper]]
+  | [NameToTypeMapper[keyof NameToTypeMapper], NameToTypeMapper[keyof NameToTypeMapper]],
   NameToTypeMapper[keyof NameToTypeMapper]
 >
 /** Property 属性类型的基本配置结构声明 */

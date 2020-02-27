@@ -25,7 +25,7 @@ export type ExtractPropertiesConfig<Config> = Config extends AsyncObjectConfig |
   : never
 /** ----------------------------- 条件类型： 获取 value 的类型声明 ----------------------------- */
 /** object 类型的 value 取值 */
-export interface ObjectValueView_Injected<ROConfig> {
+export interface ObjectValueView_Injected<ROConfig, RootConfig, InjectedObjectType> {
   $roTree: ReactifyObjectTreeNode<ROConfig>
   $set<
     Key extends ExtractConfigValueJSType<ROConfig> extends "array"
@@ -49,23 +49,37 @@ export interface ObjectValueView_Injected<ROConfig> {
     void
   >
   $root: typeof ReactifyObjectTreeNode
-  $object: ObjectValueView<ROConfig>
+  $object: Injected<RootConfig, InjectedObjectType>
 }
-export type ObjectValueView<ROConfig> = ObjectValueView_Injected<ROConfig> &
+export type ObjectValueView<ROConfig, RootConfig, InjectedObjectType> = ObjectValueView_Injected<
+  ROConfig,
+  RootConfig,
+  InjectedObjectType
+> &
   PromiseWrapper<
     ROConfig,
-    { [Key in keyof ExtractConfigValueType<ROConfig>]: ValueView<ExtractConfigValueType<ROConfig>[Key]> }
+    {
+      [Key in keyof ExtractConfigValueType<ROConfig>]: ValueView<
+        ExtractConfigValueType<ROConfig>[Key],
+        RootConfig,
+        InjectedObjectType
+      >
+    }
   >
 
 /** Array 类型的 value 取值 */
-export type ArrayValueView<ROConfig> = ArrayValueClass<ROConfig>
+export type ArrayValueView<ROConfig, RootConfig, InjectedObjectType> = ArrayValueClass<
+  ROConfig,
+  RootConfig,
+  InjectedObjectType
+>
 /** Property 类型的 value 取值 */
 export type PropertyValueView<ROConfig> = PromiseWrapper<ROConfig, ExtractTSType<ROConfig>>
 /** 条件类型：根据 Config 的类型(array/object/property) 返回其 Value 的 TS 类型 */
-export type ValueView<ROConfig> = ExtractConfigValueJSType<ROConfig> extends "object"
-  ? ObjectValueView<ROConfig>
+export type ValueView<ROConfig, RootConfig, InjectedObjectType> = ExtractConfigValueJSType<ROConfig> extends "object"
+  ? ObjectValueView<ROConfig, RootConfig, InjectedObjectType>
   : ExtractConfigValueJSType<ROConfig> extends "array"
-  ? PromiseWrapper<ROConfig, ArrayValueView<ROConfig>>
+  ? PromiseWrapper<ROConfig, ArrayValueView<ROConfig, RootConfig, InjectedObjectType>>
   : ExtractConfigValueJSType<ROConfig> extends "property"
   ? PropertyValueView<ROConfig>
   : never
@@ -86,4 +100,5 @@ export type PickRootROTreeNode<ROConfig, ParentConfig, RootConfig, InjectedObjec
   null,
   InjectedObjectType
 >
-export type Injected<RootConfig, InjectedObjectType> = ValueView<RootConfig> & InjectedObjectType
+export type Injected<RootConfig, InjectedObjectType> = ValueView<RootConfig, RootConfig, InjectedObjectType> &
+  InjectedObjectType

@@ -1,7 +1,7 @@
 import ReactifyObjectTreeNode from "../ReactifyObjectTreeNode/ReactifyObjectTreeNode"
 import { ExtractTSType } from "../../Config"
 import { DefaultRevisionInfo, RevisionInfoFunction, Patch } from "./ExportType"
-import { ValueView, TreeNodeValueJSType } from "../ReactifyObjectTreeNode/ExportType"
+import { TreeNodeValueJSType } from "../ReactifyObjectTreeNode/ExportType"
 
 declare class revision<ROConfig, RevisionInfo = DefaultRevisionInfo> {
   constructor(

@@ -42,7 +42,7 @@ declare class ReactifyObjectTreeNode<ROConfig, ParentConfig = null, RootConfig =
   children: ROTreeNodeChildren<ROConfig>
   parent: ParentConfig extends null ? null : ReactifyObjectTreeNode<ParentConfig, null, RootConfig, InjectedObjectType>
   config: ROConfig
-  value: ValueView<ROConfig>
+  value: ValueView<ROConfig, RootConfig, InjectedObjectType>
 
   get nodeType(): TreeNodeType
   get isRoot(): boolean
@@ -50,8 +50,12 @@ declare class ReactifyObjectTreeNode<ROConfig, ParentConfig = null, RootConfig =
   get isLeaf(): boolean
   get root(): PickRootROTreeNode<ROConfig, ParentConfig, RootConfig, InjectedObjectType>
   get path(): string
-  get $root(): ValueView<PickRootConfig<ROConfig, ParentConfig, RootConfig>>
-  get $object(): Injected<RootConfig, InjectedObjectType>
+  get $root(): ValueView<
+    PickRootConfig<ROConfig, ParentConfig, RootConfig>,
+    PickRootConfig<ROConfig, ParentConfig, RootConfig>,
+    InjectedObjectType
+  >
+  get $object(): Injected<PickRootConfig<ROConfig, ParentConfig, RootConfig>, InjectedObjectType>
   get isArrayNode(): boolean
   get isObjectNode(): boolean
   get getter(): ExtractTSType<ROConfig>
