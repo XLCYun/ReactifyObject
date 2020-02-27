@@ -8,13 +8,17 @@ export type AnyFunction<ArgumentArrayType extends any[] = any, ReturnType = any>
 ) => ReturnType
 
 /** 钩子函数 */
-export type AsyncHookFunction<ReturnType = any> = () => Promise<void | ReturnType>
-export type SyncHookFunction<ReturnType = any> = () => void | ReturnType
+export type AsyncHookFunction<ArgsType extends any[] = any, ReturnType = any> = (
+  ...args: ArgsType
+) => Promise<void | ReturnType>
+export type SyncHookFunction<ArgsType extends any[] = any, ReturnType = any> = (...args: ArgsType) => void | ReturnType
 
 /** 条件类型：根据 mode 选择同/异步的钩子函数声明 */
-export type PickASyncHookFunction<Mode extends ConfigMode, ReturnType = any> = Mode extends "async"
-  ? AsyncHookFunction<ReturnType>
-  : SyncHookFunction<ReturnType>
+export type PickASyncHookFunction<
+  Mode extends ConfigMode,
+  ArgsType extends any[] = any,
+  ReturnType = any
+> = Mode extends "async" ? AsyncHookFunction<ArgsType, ReturnType> : SyncHookFunction<ArgsType, ReturnType>
 
 /** 同/异步模式 mode 的声明 */
 export type ConfigMode = "async" | "sync"
@@ -45,60 +49,33 @@ export interface BsonTypeMapper<ObjectType = any, ArrayType = any> {
 }
 
 /** -------------------------------- Object 类型  -------------------------------- */
+type ObjectHookFunctionReturnType<ObjectProperitesConfig> = {
+  [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
+}
+type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig> = PickASyncHookFunction<
+  Mode,
+  [ObjectHookFunctionReturnType<ObjectProperitesConfig>],
+  ObjectHookFunctionReturnType<ObjectProperitesConfig>
+>
 /** Object 类型的基本配置结构声明
  * 其格式为 ObjectConfigBase<{propA: Config<...>, propB: Config<...>}>
  */
 interface ObjectConfigBase<Mode extends ConfigMode, ObjectProperitesConfig = any> {
   /** Hooks */
-  afterGet?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  afterSet?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  afterUpdate?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  beforeGet?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  beforeSet?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  beforeUpdate?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
-  update?: PickASyncHookFunction<
-    Mode,
-    {
-      [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]>
-    }
-  >
+  afterGet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  afterSet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  afterUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  beforeGet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  beforeSet?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  beforeUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig>
+  update?: ObjectHookFunction<Mode, ObjectProperitesConfig>
 
   bsonType?: "object"
   type?: "object"
   default?:
     | { [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]> }
     | AnyFunction<any, { [prop in keyof ObjectProperitesConfig]: ExtractTSType<ObjectProperitesConfig[prop]> }>
-  init?: SyncHookFunction<void>
+  init?: SyncHookFunction<any[], void>
   properties: { [prop in keyof ObjectProperitesConfig]: ObjectProperitesConfig[prop] }
 }
 /** 异步的 Object 类型的基本配置结构声明 */
@@ -113,23 +90,28 @@ export interface SyncObjectConfig<ObjectProperitesConfig = any>
 }
 
 /** -------------------------------- Array 类型  -------------------------------- */
+type ArrayHookFunction<Mode extends ConfigMode, ArrayItemConfig> = PickASyncHookFunction<
+  Mode,
+  [ExtractTSType<ArrayItemConfig>[]],
+  ExtractTSType<ArrayItemConfig>[]
+>
 /** Array 类型的基本配置结构声明
  * 其格式为 ArrayConfigBase<Config<...>>
  */
 export interface ArrayConfigBase<Mode extends ConfigMode, ArrayItemConfig = any> {
   /** Hooks */
-  afterGet?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  afterSet?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  afterUpdate?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  beforeGet?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  beforeSet?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  beforeUpdate?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
-  update?: PickASyncHookFunction<Mode, ExtractTSType<ArrayItemConfig>[]>
+  afterGet?: ArrayHookFunction<Mode, ArrayItemConfig>
+  afterSet?: ArrayHookFunction<Mode, ArrayItemConfig>
+  afterUpdate?: ArrayHookFunction<Mode, ArrayItemConfig>
+  beforeGet?: ArrayHookFunction<Mode, ArrayItemConfig>
+  beforeSet?: ArrayHookFunction<Mode, ArrayItemConfig>
+  beforeUpdate?: ArrayHookFunction<Mode, ArrayItemConfig>
+  update?: ArrayHookFunction<Mode, ArrayItemConfig>
 
   bsonType?: "array"
   type?: "array"
   default?: ExtractTSType<ArrayItemConfig>[] | AnyFunction<any, ExtractTSType<ArrayItemConfig>[]>
-  init?: SyncHookFunction<void>
+  init?: SyncHookFunction<any[], void>
   items: ArrayItemConfig
 }
 /** 异步的 Array 类型的基本配置结构声明 */
@@ -142,23 +124,28 @@ export interface SyncArrayConfig<ArrayItemConfig = any> extends ArrayConfigBase<
 }
 
 /** -------------------------------- Property 类型  -------------------------------- */
+type PropertyHookFunction<Mode extends ConfigMode, NameToTypeMapper> = PickASyncHookFunction<
+  Mode,
+  [NameToTypeMapper[keyof NameToTypeMapper]],
+  NameToTypeMapper[keyof NameToTypeMapper]
+>
 /** Property 属性类型的基本配置结构声明 */
 export interface PropertyConfigBase<Mode extends ConfigMode, NameToTypeMapper = BsonTypeMapper> {
   /** Hooks */
-  afterGet?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  afterSet?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  afterUpdate?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  beforeGet?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  beforeSet?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  beforeUpdate?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
-  update?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
+  afterGet?: PropertyHookFunction<Mode, NameToTypeMapper>
+  afterSet?: PropertyHookFunction<Mode, NameToTypeMapper>
+  afterUpdate?: PropertyHookFunction<Mode, NameToTypeMapper>
+  beforeGet?: PropertyHookFunction<Mode, NameToTypeMapper>
+  beforeSet?: PropertyHookFunction<Mode, NameToTypeMapper>
+  beforeUpdate?: PropertyHookFunction<Mode, NameToTypeMapper>
+  update?: PropertyHookFunction<Mode, NameToTypeMapper>
 
   bsonType?: keyof NameToTypeMapper | (keyof NameToTypeMapper)[]
   type?: keyof TypeMapper | keyof TypeMapper[]
 
   default?: NameToTypeMapper[keyof NameToTypeMapper] | AnyFunction<any, NameToTypeMapper[keyof NameToTypeMapper]>
   validator?: AnyFunction<[NameToTypeMapper[keyof NameToTypeMapper]], boolean>
-  init?: PickASyncHookFunction<Mode, NameToTypeMapper[keyof NameToTypeMapper]>
+  init?: SyncHookFunction<any, void>
 }
 /** 异步的 Property 属性类型的基本配置结构声明 */
 export interface AsyncPropertyConfig<NameToTypeMapper = BsonTypeMapper>
