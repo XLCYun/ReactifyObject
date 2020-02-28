@@ -1,9 +1,9 @@
 import { PromiseWrapper, ExtractConfigValueType, ExtractTSType, ExtractTSTypePromise } from "../../../Config"
 import ReactifyObjectTreeNode = require("../ReactifyObjectTreeNode")
 import { ObjectValueView, ValueView } from "../ExportType"
-declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> extends Array<any> {
+declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   constructor(treeNode: typeof ReactifyObjectTreeNode)
-  [Symbol.iterator](): IterableIterator<ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>>
+  [Symbol.iterator](): IterableIterator<ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>>
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
   $set(
