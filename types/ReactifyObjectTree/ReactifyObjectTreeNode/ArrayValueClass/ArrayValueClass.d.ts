@@ -4,6 +4,7 @@ import { ObjectValueView, ValueView } from "../ExportType"
 declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   constructor(treeNode: typeof ReactifyObjectTreeNode)
   [Symbol.iterator](): IterableIterator<ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>>
+  [index: number]: ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>
   length: number
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
