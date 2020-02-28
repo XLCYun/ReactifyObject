@@ -4,6 +4,7 @@ import { ObjectValueView, ValueView } from "../ExportType"
 declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   constructor(treeNode: typeof ReactifyObjectTreeNode)
   [index: number]: ValueView<ExtractConfigValueType<ROConfig>, RootConfig, InjectedObjectType>
+  [Symbol.iterator](): ValueView<ExtractConfigValueType<ROConfig>, RootConfig, InjectedObjectType>
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
   $set(
