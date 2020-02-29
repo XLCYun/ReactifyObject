@@ -8,11 +8,7 @@ declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   length: number
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
-  $set(
-    this: ReactifyObjectTreeNode<ROConfig>,
-    propertyName: number,
-    newValue: ExtractTSType<ExtractConfigValueType<ROConfig>>
-  ): void
+  $set(propertyName: number, newValue: ExtractTSType<ExtractConfigValueType<ROConfig>>): void
 
   get $root(): typeof ReactifyObjectTreeNode
   emit<ResultType = any>(result: ResultType, eventName: string): ResultType
@@ -21,9 +17,13 @@ declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   unshift(
     ...addItems: ExtractTSType<ExtractConfigValueType<ROConfig>>[]
   ): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
-  splice(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
-  push(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
-  copyWithin(): PromiseWrapper<ROConfig, void>
+  splice(
+    start: number,
+    deleteCount: number,
+    ...pushItems: ExtractTSType<ExtractConfigValueType<ROConfig>>[]
+  ): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
+  push(value: ExtractTSType<ExtractConfigValueType<ROConfig>>): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
+  copyWithin(target: number, start: number, end: number): PromiseWrapper<ROConfig, void>
   reverse(): ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>
   fill(
     value: ExtractConfigValueType<ROConfig>,
