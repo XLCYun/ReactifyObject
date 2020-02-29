@@ -48,7 +48,7 @@ export interface ObjectValueView_Injected<ROConfig, RootConfig, InjectedObjectTy
       : never,
     void
   >
-  $root: typeof ReactifyObjectTreeNode
+  $root: ValueView<ROConfig, RootConfig, InjectedObjectType>
   $object: Injected<RootConfig, InjectedObjectType>
 }
 export type ObjectValueView<ROConfig, RootConfig, InjectedObjectType> = ObjectValueView_Injected<
