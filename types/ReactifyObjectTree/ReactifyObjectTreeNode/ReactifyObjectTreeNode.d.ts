@@ -109,7 +109,7 @@ declare class ReactifyObjectTreeNode<ROConfig, ParentConfig = null, RootConfig =
   checkCircular(track?: string[]): boolean
   setupRevision(generateRevisionInfoFunction: (...args: any[]) => any): void
   getTreeNodeByPath(path: string): typeof ReactifyObjectTreeNode
-  register(object: any, index: string | number, deep: boolean): void
+  register(object: any, index: string | number, deep?: boolean): void
 }
 
 export = ReactifyObjectTreeNode
