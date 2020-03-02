@@ -169,8 +169,8 @@ describe("get.js", function() {
     })
   })
 
-  /* ---------------------- async get ---------------------- */
-
+  /* ---------------------- async get is not supported, getting a value will always directly return its value ---------------------- */
+  /*
   describe("async get", function() {
     let config = {
       a: { properties: { b: { properties: { c: { properties: {} }, c2: {} } }, b2: {} } },
@@ -333,6 +333,7 @@ describe("get.js", function() {
         assert.equal(e.message, "get.test.js, async afterGet throw Error")
         assert.ok(test)
       }
-    })
-  })
+    }) 
+    
+  })*/
 })

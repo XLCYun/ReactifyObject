@@ -5,8 +5,7 @@ import {
   ExtractTSType,
   PromiseWrapper,
   ExtractConfigValueType,
-  ExtractConfigValueJSType,
-  ExtractTSTypePromise
+  ExtractConfigValueJSType
 } from "./../../Config"
 import ArrayValueClass = require("./ArrayValueClass/ArrayValueClass")
 
@@ -56,16 +55,13 @@ export type ObjectValueView<ROConfig, RootConfig, InjectedObjectType> = ObjectVa
   RootConfig,
   InjectedObjectType
 > &
-  PromiseWrapper<
-    ROConfig,
-    {
-      [Key in keyof ExtractConfigValueType<ROConfig>]: ValueView<
-        ExtractConfigValueType<ROConfig>[Key],
-        RootConfig,
-        InjectedObjectType
-      >
-    }
-  >
+  {
+    [Key in keyof ExtractConfigValueType<ROConfig>]: ValueView<
+      ExtractConfigValueType<ROConfig>[Key],
+      RootConfig,
+      InjectedObjectType
+    >
+  }
 
 /** Array 类型的 value 取值 */
 export type ArrayValueView<ROConfig, RootConfig, InjectedObjectType> = ArrayValueClass<
@@ -74,12 +70,12 @@ export type ArrayValueView<ROConfig, RootConfig, InjectedObjectType> = ArrayValu
   InjectedObjectType
 >
 /** Property 类型的 value 取值 */
-export type PropertyValueView<ROConfig> = PromiseWrapper<ROConfig, ExtractTSType<ROConfig>>
+export type PropertyValueView<ROConfig> = ExtractTSType<ROConfig>
 /** 条件类型：根据 Config 的类型(array/object/property) 返回其 Value 的 TS 类型 */
 export type ValueView<ROConfig, RootConfig, InjectedObjectType> = ExtractConfigValueJSType<ROConfig> extends "object"
   ? ObjectValueView<ROConfig, RootConfig, InjectedObjectType>
   : ExtractConfigValueJSType<ROConfig> extends "array"
-  ? PromiseWrapper<ROConfig, ArrayValueView<ROConfig, RootConfig, InjectedObjectType>>
+  ? ArrayValueView<ROConfig, RootConfig, InjectedObjectType>
   : ExtractConfigValueJSType<ROConfig> extends "property"
   ? PropertyValueView<ROConfig>
   : never

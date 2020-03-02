@@ -1,10 +1,10 @@
-import { PromiseWrapper, ExtractConfigValueType, ExtractTSType, ExtractTSTypePromise } from "../../../Config"
+import { PromiseWrapper, ExtractConfigValueType, ExtractTSType } from "../../../Config"
 import ReactifyObjectTreeNode = require("../ReactifyObjectTreeNode")
 import { ObjectValueView, ValueView } from "../ExportType"
 declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
   constructor(treeNode: typeof ReactifyObjectTreeNode)
-  [Symbol.iterator](): IterableIterator<ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>>
-  [index: number]: ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>
+  [Symbol.iterator](): IterableIterator<ExtractTSType<ExtractConfigValueType<ROConfig>>>
+  [index: number]: ExtractTSType<ExtractConfigValueType<ROConfig>>
   length: number
 
   $roTree: ReactifyObjectTreeNode<ROConfig>
@@ -12,17 +12,17 @@ declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
 
   get $root(): typeof ReactifyObjectTreeNode
   emit<ResultType = any>(result: ResultType, eventName: string): ResultType
-  pop(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>
-  shift(): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
+  pop(): ExtractTSType<ExtractConfigValueType<ROConfig>>
+  shift(): ExtractTSType<ExtractConfigValueType<ROConfig>>[]
   unshift(
     ...addItems: ExtractTSType<ExtractConfigValueType<ROConfig>>[]
-  ): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
+  ): ExtractTSType<ExtractConfigValueType<ROConfig>>[]
   splice(
     start: number,
     deleteCount: number,
     ...pushItems: ExtractTSType<ExtractConfigValueType<ROConfig>>[]
-  ): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
-  push(value: ExtractTSType<ExtractConfigValueType<ROConfig>>): ExtractTSTypePromise<ExtractConfigValueType<ROConfig>>[]
+  ): ExtractTSType<ExtractConfigValueType<ROConfig>>[]
+  push(value: ExtractTSType<ExtractConfigValueType<ROConfig>>): ExtractTSType<ExtractConfigValueType<ROConfig>>[]
   copyWithin(target: number, start: number, end: number): PromiseWrapper<ROConfig, void>
   reverse(): ArrayValueClass<ROConfig, RootConfig, InjectedObjectType>
   fill(

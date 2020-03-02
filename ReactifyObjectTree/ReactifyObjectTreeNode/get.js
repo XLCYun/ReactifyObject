@@ -44,7 +44,12 @@ function getSync() {
  * getter for current node's value
  */
 function get() {
-  return this.mode === "sync" ? getSync.call(this) : getAsync.call(this)
+  /**
+   * 2020-03-02 Dispite 'async' mode, reading a properties will always return value directly
+   * If you need a property that is compute by others properties, created it as a real property,
+   * and register the dependcies and use update function to update its value.
+   */
+  return this.mode === "sync" ? getSync.call(this) : getSync.call(this)
 }
 
 module.exports = get

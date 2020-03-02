@@ -66,10 +66,10 @@ type ObjectHookFunction<Mode extends ConfigMode, ObjectProperitesConfig, NumberO
  */
 interface ObjectConfigBase<Mode extends ConfigMode, ObjectProperitesConfig = any> {
   /** Hooks */
-  afterGet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "1">
+  afterGet?: ObjectHookFunction<"sync", ObjectProperitesConfig, "1">
   afterSet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
   afterUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
-  beforeGet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "1">
+  beforeGet?: ObjectHookFunction<"sync", ObjectProperitesConfig, "1">
   beforeSet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
   beforeUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
   update?: ObjectHookFunction<Mode, ObjectProperitesConfig, "0">
@@ -305,92 +305,3 @@ type ExtractTSType10<Config> = ExtractConfigValueJSType<Config> extends "propert
   : ExtractConfigValueJSType<Config> extends "array"
   ? any[]
   : { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSType<ExtractConfigValueType<Config>[prop]> }
-
-/**
- * 根据一个 Config 取出其 TS 类型声明，如果该 Config 的 mode 是 async，则用 Promise 进行包裹
- * 如果该 Config 是 property 的 Config，返回该属性的合法取值的 TS 类型声明
- * 如果该 Config 是 array 的 Config，返回该数组元素的合法取值的 TS 类型声明
- * 如果该 Config 是 object 的 Config，返回该对象的合法取值的接口
- * 由于 TS 不支持 Type 循环嵌套，对于数组目前支持 10 层数组直接连续的嵌套，超出此层数后将不再有类型检查支持，而使用 any[]
- */
-export type ExtractTSTypePromise<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise2<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-
-export type ExtractTSTypePromise2<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise3<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise3<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise4<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise4<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise5<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise5<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise6<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise6<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise7<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise7<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise8<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise8<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise9<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise9<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, ExtractTSTypePromise10<ExtractConfigValueType<Config>>[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >
-export type ExtractTSTypePromise10<Config> = ExtractConfigValueJSType<Config> extends "property"
-  ? PromiseWrapper<Config, ExtractConfigValueType<Config>[keyof ExtractConfigValueType<Config>]>
-  : ExtractConfigValueJSType<Config> extends "array"
-  ? PromiseWrapper<Config, any[]>
-  : PromiseWrapper<
-      Config,
-      { [prop in keyof ExtractConfigValueType<Config>]: ExtractTSTypePromise<ExtractConfigValueType<Config>[prop]> }
-    >

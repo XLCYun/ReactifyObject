@@ -8,8 +8,7 @@ import {
   ExtractConfigValueJSType,
   ExtractConfigValueType,
   ExtractConfigMode,
-  PromiseWrapper,
-  ExtractTSTypePromise
+  PromiseWrapper
 } from "../../Config"
 import EventMan = require("@xlcyun/event-man")
 import ArrayValueClass from "./ArrayValueClass/ArrayValueClass"
