@@ -40,7 +40,7 @@ declare class ArrayValueClass<ROConfig, RootConfig, InjectedObjectType> {
     treeNode: ReactifyObjectTreeNode<ROConfig>,
     object: ExtractTSType<ROConfig>,
     copyFrom?: ExtractTSType<ROConfig>
-  )
+  ): void
   getTreeNodeByIndex(index: number): ReactifyObjectTreeNode<ExtractConfigValueType<ROConfig>>
 }
 

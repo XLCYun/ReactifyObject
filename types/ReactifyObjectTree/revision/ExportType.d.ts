@@ -7,7 +7,7 @@ export interface DefaultRevisionInfo {
   path: string
 }
 export type RevisionInfoFunction<ROConfig, RevisionInfo = DefaultRevisionInfo> = (
-  this: ValueView<ROConfig>,
+  this: ValueView<ROConfig, any, RevisionInfo>,
   value: ReactifyObjectTreeNode<ROConfig>
 ) => RevisionInfo
 
