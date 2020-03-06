@@ -13,10 +13,10 @@ function setSync(treeNode, newValue) {
   // The function `set` already make sure it has parent
   let result = treeNode.beforeSet.call(treeNode.parent.value, newValue, oldValue)
   if (result === false) return
-  treeNode.event.emit("beforeSet", treeNode.parent.value, newValue, oldValue).once
+  treeNode.event.emit("beforeSet", newValue, oldValue).once
   treeNode.value = newValue
   treeNode.afterSet.call(treeNode.parent.value, newValue, oldValue)
-  treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once
+  treeNode.event.emit("afterSet", newValue, oldValue).once
 }
 
 /**
@@ -31,10 +31,10 @@ async function setAsync(treeNode, newValue) {
     // The function `set` already make sure it has parent
     let result = await treeNode.beforeSet.call(treeNode.parent.value, newValue, oldValue)
     if (result === false) return
-    await treeNode.event.emit("beforeSet", treeNode.parent.value, newValue, oldValue).once
+    await treeNode.event.emit("beforeSet", newValue, oldValue).once
     treeNode.value = newValue
     await treeNode.afterSet.call(treeNode.parent.value, newValue, oldValue)
-    await treeNode.event.emit("afterSet", treeNode.parent.value, newValue, oldValue).once
+    await treeNode.event.emit("afterSet", newValue, oldValue).once
   } catch (e) {
     throw e
   }

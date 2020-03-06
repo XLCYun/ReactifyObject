@@ -147,9 +147,9 @@ describe("set.js", function() {
         let theOldValue = (treeNode.children.a2.value = "a2 value")
         let theNewValue = "new value"
         let test = false
-        treeNode.children.a2.event.on("beforeSet", function(object, newValue, oldValue) {
+        treeNode.children.a2.event.on("beforeSet", function(/*object,*/ newValue, oldValue) {
           test = true
-          assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
+          // assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
           assert.equal(newValue, theNewValue, "second argument of the listener function should be the new value")
           assert.equal(oldValue, theOldValue, "thrid argument of listener fucntion should be the old value")
         })
@@ -162,9 +162,9 @@ describe("set.js", function() {
         let theOldValue = (treeNode.children.a2.value = "a2 value")
         let theNewValue = "new value"
         let test = false
-        treeNode.children.a2.event.on("afterSet", function(object, newValue, oldValue) {
+        treeNode.children.a2.event.on("afterSet", function(/*object,*/ newValue, oldValue) {
           test = true
-          assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
+          // assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
           assert.equal(newValue, theNewValue, "second argument of the listener function should be the new value")
           assert.equal(oldValue, theOldValue, "thrid argument of listener fucntion should be the old value")
         })
@@ -261,9 +261,9 @@ describe("set.js", function() {
         let theOldValue = (treeNode.children.a2.value = "a2 value")
         let theNewValue = "new value"
         let test = false
-        treeNode.children.a2.event.on("beforeSet", async function(object, newValue, oldValue) {
+        treeNode.children.a2.event.on("beforeSet", async function(/*object,*/ newValue, oldValue) {
           test = true
-          assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
+          // assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
           assert.equal(newValue, theNewValue, "second argument of the listener function should be the new value")
           assert.equal(oldValue, theOldValue, "thrid argument of listener fucntion should be the old value")
         })
@@ -276,9 +276,9 @@ describe("set.js", function() {
         let theOldValue = (treeNode.children.a2.value = "a2 value")
         let theNewValue = "new value"
         let test = false
-        treeNode.children.a2.event.on("afterSet", async function(object, newValue, oldValue) {
+        treeNode.children.a2.event.on("afterSet", async function(/*object,*/ newValue, oldValue) {
           test = true
-          assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
+          // assert.equal(object, treeNode.value, "first argument of the listener function should be target object")
           assert.equal(newValue, theNewValue, "second argument of the listener function should be the new value")
           assert.equal(oldValue, theOldValue, "thrid argument of listener fucntion should be the old value")
         })
