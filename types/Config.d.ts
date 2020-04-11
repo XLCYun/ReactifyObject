@@ -72,7 +72,9 @@ interface ObjectConfigBase<Mode extends ConfigMode, ObjectProperitesConfig = any
   beforeGet?: ObjectHookFunction<"sync", ObjectProperitesConfig, "1">
   beforeSet?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
   beforeUpdate?: ObjectHookFunction<Mode, ObjectProperitesConfig, "2">
-  update?: ObjectHookFunction<Mode, ObjectProperitesConfig, "0">
+  update?:
+    | ObjectHookFunction<"async", ObjectProperitesConfig, "0">
+    | ObjectHookFunction<"sync", ObjectProperitesConfig, "0">
 
   bsonType?: "object"
   type?: "object"
@@ -114,7 +116,7 @@ export interface ArrayConfigBase<Mode extends ConfigMode, ArrayItemConfig = any>
   beforeGet?: ArrayHookFunction<Mode, ArrayItemConfig, "1">
   beforeSet?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
   beforeUpdate?: ArrayHookFunction<Mode, ArrayItemConfig, "2">
-  update?: ArrayHookFunction<Mode, ArrayItemConfig, "0">
+  update?: ArrayHookFunction<"async", ArrayItemConfig, "0"> | ArrayHookFunction<"sync", ArrayItemConfig, "0">
 
   bsonType?: "array"
   type?: "array"
@@ -150,7 +152,7 @@ export interface PropertyConfigBase<Mode extends ConfigMode, NameToTypeMapper = 
   beforeGet?: PropertyHookFunction<Mode, NameToTypeMapper, "1">
   beforeSet?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
   beforeUpdate?: PropertyHookFunction<Mode, NameToTypeMapper, "2">
-  update?: PropertyHookFunction<Mode, NameToTypeMapper, "0">
+  update?: PropertyHookFunction<"async", NameToTypeMapper, "0"> | PropertyHookFunction<"sync", NameToTypeMapper, "0">
 
   bsonType?: keyof NameToTypeMapper | (keyof NameToTypeMapper)[]
   type?: keyof TypeMapper | keyof TypeMapper[]
