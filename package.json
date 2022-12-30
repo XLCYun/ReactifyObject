@@ -27,7 +27,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "nyc": "^15.0.0"
   },
   "typings": "types/ReactifyObject.d.ts"
